@@ -1,0 +1,11 @@
+/**
+ * Global theme variables for SariPay B2B Escrow App
+ */
+:root {
+  --color-primary-bg: #0B1411;
+  --color-surface-container: #12221D;
+  --color-accent-mint: #10B981;
+  --color-accent-emerald: #34D399;
+  --color-text-primary: #F3F4F6;
+  --color-text-muted: #9CA3AF;
+}

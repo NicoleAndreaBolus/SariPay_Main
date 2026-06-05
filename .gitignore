@@ -1,0 +1,15 @@
+# Node dependencies
+node_modules/
+
+# Rust build artifacts
+target/
+
+# Local environment configs
+.env*
+.env.local
+
+# IDE / OS junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

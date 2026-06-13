@@ -11,6 +11,7 @@ import { QRGenerator } from '@/components/qr/QRGenerator';
 import { QRScanner } from '@/components/qr/QRScanner';
 import { shortenAddress } from '@/utils/address';
 import confetti from 'canvas-confetti';
+import { syncWithServer } from '@/utils/sync';
 import { 
   Wallet,
   Home,
@@ -126,10 +127,10 @@ export default function UnifiedDashboard() {
         setImportOrderId('');
         router.push(`/order/${cleanId}`);
       } else {
-        alert(`Order #${cleanId} could not be found on the blockchain ledger. Make sure the ID is correct.`);
+        triggerAlert(`Order #${cleanId} could not be found on the blockchain ledger. Make sure the ID is correct.`, "Error", "error");
       }
     } catch (err: any) {
-      alert(err?.message || "Failed to import order.");
+      triggerAlert(err?.message || "Failed to import order.", "Error", "error");
     } finally {
       setIsImporting(false);
     }
@@ -193,6 +194,27 @@ export default function UnifiedDashboard() {
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
   const [isSubmittingInvoice, setIsSubmittingInvoice] = useState(false);
 
+  const [alertConfig, setAlertConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'info' | 'error' | 'success';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
+
+  const triggerAlert = (message: string, title = 'Notice', type: 'info' | 'error' | 'success' = 'info') => {
+    setAlertConfig({
+      isOpen: true,
+      title,
+      message,
+      type
+    });
+  };
+
   // Settings profile states
   const [profileName, setProfileName] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -241,28 +263,32 @@ export default function UnifiedDashboard() {
 
   // Load Workspaces from LocalStorage or default
   useEffect(() => {
-    const savedWorkspaces = localStorage.getItem('saripay_workspaces');
-    const savedActiveId = localStorage.getItem('saripay_active_workspace_id');
-    
-    if (savedWorkspaces) {
-      try {
-        const parsed = JSON.parse(savedWorkspaces);
-        setWorkspaces(parsed);
-        if (parsed.length === 0) {
+    const loadAndSync = async () => {
+      const synced = await syncWithServer();
+      const savedWorkspaces = localStorage.getItem('saripay_workspaces');
+      const savedActiveId = localStorage.getItem('saripay_active_workspace_id');
+      
+      if (savedWorkspaces) {
+        try {
+          const parsed = JSON.parse(savedWorkspaces);
+          setWorkspaces(parsed);
+          if (parsed.length === 0) {
+            setIsOnboardingOpen(true);
+          } else if (savedActiveId && parsed.some((w: Workspace) => w.id === savedActiveId)) {
+            setActiveWorkspaceId(savedActiveId);
+          } else if (parsed.length > 0) {
+            setActiveWorkspaceId(parsed[0].id);
+          }
+        } catch {
+          initializeDefaultWorkspaces();
           setIsOnboardingOpen(true);
-        } else if (savedActiveId && parsed.some((w: Workspace) => w.id === savedActiveId)) {
-          setActiveWorkspaceId(savedActiveId);
-        } else if (parsed.length > 0) {
-          setActiveWorkspaceId(parsed[0].id);
         }
-      } catch {
+      } else {
         initializeDefaultWorkspaces();
         setIsOnboardingOpen(true);
       }
-    } else {
-      initializeDefaultWorkspaces();
-      setIsOnboardingOpen(true);
-    }
+    };
+    loadAndSync();
   }, []);
 
   const initializeDefaultWorkspaces = () => {
@@ -333,35 +359,39 @@ export default function UnifiedDashboard() {
     }
   }, []);
 
-  // Sync workspaces from local storage periodically & notify of status updates
+  // Sync workspaces and states from server periodically & notify of status updates
   useEffect(() => {
-    const interval = setInterval(() => {
-      const savedWorkspaces = localStorage.getItem('saripay_workspaces');
-      if (savedWorkspaces) {
-        try {
-          const parsed = JSON.parse(savedWorkspaces);
+    const interval = setInterval(async () => {
+      const synced = await syncWithServer();
+      if (synced && synced.workspaces) {
+        setWorkspaces(prevWorkspaces => {
+          const activeId = localStorage.getItem('saripay_active_workspace_id') || '';
+          const oldActive = prevWorkspaces.find(w => w.id === activeId);
+          const newActive = synced.workspaces.find((w: any) => w.id === activeId);
           
-          setWorkspaces(prevWorkspaces => {
-            const activeId = localStorage.getItem('saripay_active_workspace_id') || '';
-            const oldActive = prevWorkspaces.find(w => w.id === activeId);
-            const newActive = parsed.find((w: any) => w.id === activeId);
-            
-            if (oldActive && newActive && oldActive.verificationStatus !== newActive.verificationStatus) {
-              if (newActive.verificationStatus === 'Verified') {
-                addNotification("Workspace Verified!", `Congratulations! '${newActive.name}' is now fully verified by admin.`, "success");
-              } else if (newActive.verificationStatus === 'Rejected') {
-                addNotification("Verification Rejected", `'${newActive.name}' verification was rejected: ${newActive.rejectionReason || "Check compliance rules."}`, "warning");
-              } else if (newActive.verificationStatus === 'Requires Additional Information') {
-                addNotification("Compliance Info Required", `Compliance requires updates for '${newActive.name}': ${newActive.missingDocs || "Check docs."}`, "warning");
-              }
+          if (oldActive && newActive && oldActive.verificationStatus !== newActive.verificationStatus) {
+            if (newActive.verificationStatus === 'Verified') {
+              addNotification("Workspace Verified!", `Congratulations! '${newActive.name}' is now fully verified by admin.`, "success");
+            } else if (newActive.verificationStatus === 'Rejected') {
+              addNotification("Verification Rejected", `'${newActive.name}' verification was rejected: ${newActive.rejectionReason || "Check compliance rules."}`, "warning");
+            } else if (newActive.verificationStatus === 'Requires Additional Information') {
+              addNotification("Compliance Info Required", `Compliance requires updates for '${newActive.name}': ${newActive.missingDocs || "Check docs."}`, "warning");
             }
-            return parsed;
-          });
-        } catch (e) {
-          console.error("Failed to parse workspaces sync", e);
+          }
+          return synced.workspaces;
+        });
+
+        // Sync active workspace ID
+        const savedActiveId = localStorage.getItem('saripay_active_workspace_id');
+        if (!savedActiveId && synced.workspaces.length > 0) {
+          const firstId = synced.workspaces[0].id;
+          setActiveWorkspaceId(firstId);
+          localStorage.setItem('saripay_active_workspace_id', firstId);
+        } else if (savedActiveId) {
+          setActiveWorkspaceId(savedActiveId);
         }
       }
-    }, 2000);
+    }, 3000);
     return () => clearInterval(interval);
   }, [addNotification]);
 
@@ -410,6 +440,9 @@ export default function UnifiedDashboard() {
     setActiveWorkspaceId(newWs.id);
     localStorage.setItem('saripay_workspaces', JSON.stringify(updated));
     localStorage.setItem('saripay_active_workspace_id', newWs.id);
+    // Sync with the shared server database immediately
+    syncWithServer().catch(err => console.error("Failed to sync new workspace:", err));
+    
     setIsOnboardingOpen(false);
     addNotification("Workspace Created", `Workspace '${newWs.name}' has been successfully created.`, "success");
 
@@ -488,6 +521,9 @@ export default function UnifiedDashboard() {
     };
     localStorage.setItem('saripay_admin_logs', JSON.stringify([newLog, ...logs]));
 
+    // Sync with the shared server database immediately
+    syncWithServer().catch(err => console.error("Failed to sync verification submission:", err));
+
     setIsVerificationModalOpen(false);
     setIsSubmittingVerification(false);
     addNotification("Verification Submitted", `Compliance documentation for '${activeWorkspace?.name}' submitted successfully.`, "info");
@@ -502,7 +538,7 @@ export default function UnifiedDashboard() {
   // --- MERCHANT OPERATIONS ---
   const handleLockEscrow = async (id: string, amount: string) => {
     if (activeWorkspace?.verificationStatus !== 'Verified') {
-      alert("Verification Required: Your business workspace must be Verified by SariPay compliance before funding active escrows.");
+      triggerAlert("Verification Required: Your business workspace must be Verified by SariPay compliance before funding active escrows.", "Verification Required", "error");
       return;
     }
     setFundingId(id);
@@ -520,7 +556,7 @@ export default function UnifiedDashboard() {
         });
       }
     } catch (err: any) {
-      alert(err?.message || "Failed to fund escrow contract.");
+      triggerAlert(err?.message || "Failed to fund escrow contract.", "Error", "error");
     } finally {
       setFundingId(null);
     }
@@ -528,7 +564,7 @@ export default function UnifiedDashboard() {
 
   const openQrModal = (order: Order) => {
     if (activeWorkspace?.verificationStatus !== 'Verified') {
-      alert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.");
+      triggerAlert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.", "Verification Required", "error");
       return;
     }
     setSelectedOrder(order);
@@ -562,7 +598,7 @@ export default function UnifiedDashboard() {
   // --- DISTRIBUTOR OPERATIONS ---
   const handleShipOrder = async (id: string) => {
     if (activeWorkspace?.verificationStatus !== 'Verified') {
-      alert("Verification Required: Workspace must be Verified to complete settlements or dispatch escrows.");
+      triggerAlert("Verification Required: Workspace must be Verified to complete settlements or dispatch escrows.", "Verification Required", "error");
       return;
     }
     setIsShippingId(id);
@@ -576,7 +612,7 @@ export default function UnifiedDashboard() {
         colors: ['#059669', '#10B981']
       });
     } catch (err: any) {
-      alert(err?.message || "Failed to dispatch cargo.");
+      triggerAlert(err?.message || "Failed to dispatch cargo.", "Error", "error");
     } finally {
       setIsShippingId(null);
     }
@@ -584,7 +620,7 @@ export default function UnifiedDashboard() {
 
   const openScanner = (order: Order) => {
     if (activeWorkspace?.verificationStatus !== 'Verified') {
-      alert("Verification Required: Workspace must be Verified to scan handoff QR codes.");
+      triggerAlert("Verification Required: Workspace must be Verified to scan handoff QR codes.", "Verification Required", "error");
       return;
     }
     setSelectedOrder(order);
@@ -607,7 +643,7 @@ export default function UnifiedDashboard() {
         await refreshBalance();
       }
     } catch (err: any) {
-      alert(err?.message || "Verification code mismatch.");
+      triggerAlert(err?.message || "Verification code mismatch.", "Error", "error");
     }
   };
 
@@ -753,7 +789,7 @@ export default function UnifiedDashboard() {
   // --- SETTINGS CONTROLS ---
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Profile settings saved successfully!");
+    triggerAlert("Profile settings saved successfully!", "Success", "success");
   };
 
   const handleRegisterPasskey = () => {
@@ -770,7 +806,7 @@ export default function UnifiedDashboard() {
 
   const handleDeleteWorkspace = (id: string) => {
     if (workspaces.length <= 1) {
-      alert("You must keep at least one active workspace.");
+      triggerAlert("You must keep at least one active workspace.", "Notice", "info");
       return;
     }
     if (confirm("Are you sure you want to delete this workspace? All settings will be lost.")) {
@@ -1357,7 +1393,7 @@ export default function UnifiedDashboard() {
                       <p className="text-xs text-[#6B7280] max-w-sm mb-4">You have settled all invoices. Wait for your suppliers to send new order invoices.</p>
                       <Button
                         variant="primary"
-                        onClick={() => alert("Please request your wholesale supplier to send an order invoice. Or fund existing balances.")}
+                        onClick={() => triggerAlert("Please request your wholesale supplier to send an order invoice. Or fund existing balances.", "Notice", "info")}
                         className="bg-[#059669] text-xs font-semibold py-2 px-4 rounded-xl"
                       >
                         Contact Supplier
@@ -1392,7 +1428,7 @@ export default function UnifiedDashboard() {
                         if (funded) {
                           openQrModal(funded);
                         } else {
-                          alert("No funded escrow orders available to verify. Please fund an order first.");
+                          triggerAlert("No funded escrow orders available to verify. Please fund an order first.", "Notice", "info");
                         }
                       }}
                       className={`text-xs font-bold w-full py-3.5 mt-5 rounded-xl cursor-pointer ${
@@ -1412,12 +1448,12 @@ export default function UnifiedDashboard() {
                       <button 
                         onClick={() => {
                           if (activeWorkspace.verificationStatus !== 'Verified') {
-                            alert("Verification Required: Workspace must be Verified to fund escrows.");
+                            triggerAlert("Verification Required: Workspace must be Verified to fund escrows.", "Verification Required", "error");
                             return;
                           }
                           const init = orders.find(o => o.status === 'Initialized');
                           if (init) handleLockEscrow(init.id, init.amount);
-                          else alert("No initialized orders. Ask your supplier to create one.");
+                          else triggerAlert("No initialized orders. Ask your supplier to create one.", "Notice", "info");
                         }}
                         className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
                       >
@@ -1425,7 +1461,7 @@ export default function UnifiedDashboard() {
                         <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
                       </button>
                       <button
-                        onClick={() => alert("Wallet Activity Log: Settle on Stellar testnet Horizonal ledger.")}
+                        onClick={() => triggerAlert("Wallet Activity Log: Settle on Stellar testnet Horizonal ledger.", "Wallet Activity", "info")}
                         className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
                       >
                         <span>Wallet Activity</span>
@@ -1475,7 +1511,7 @@ export default function UnifiedDashboard() {
                   <Button
                     onClick={() => {
                       if (activeWorkspace.verificationStatus !== 'Verified') {
-                        alert("Verification Required: Distributor workspace must be Verified to initialize purchase invoices.");
+                        triggerAlert("Verification Required: Distributor workspace must be Verified to initialize purchase invoices.", "Verification Required", "error");
                         return;
                       }
                       setIsCreateInvoiceOpen(true);
@@ -1670,7 +1706,7 @@ export default function UnifiedDashboard() {
                         variant="primary"
                         onClick={() => {
                           if (activeWorkspace.verificationStatus !== 'Verified') {
-                            alert("Verification Required: Workspace must be Verified to create order invoices.");
+                            triggerAlert("Verification Required: Workspace must be Verified to create order invoices.", "Verification Required", "error");
                             return;
                           }
                           setIsCreateInvoiceOpen(true);
@@ -1713,7 +1749,7 @@ export default function UnifiedDashboard() {
                         if (inTransit) {
                           openScanner(inTransit);
                         } else {
-                          alert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.");
+                          triggerAlert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.", "Notice", "info");
                         }
                       }}
                       className={`text-xs font-bold w-full py-3.5 mt-5 rounded-xl cursor-pointer ${
@@ -1893,7 +1929,7 @@ export default function UnifiedDashboard() {
                 <button
                   onClick={() => {
                     if (activeWorkspace?.verificationStatus !== 'Verified') {
-                      alert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.");
+                      triggerAlert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.", "Verification Required", "error");
                       return;
                     }
                     setIsQuickQrPickerOpen(true);
@@ -1915,14 +1951,14 @@ export default function UnifiedDashboard() {
                 <button
                   onClick={() => {
                     if (activeWorkspace?.verificationStatus !== 'Verified') {
-                      alert("Verification Required: Workspace must be Verified to scan handoff QR codes.");
+                      triggerAlert("Verification Required: Workspace must be Verified to scan handoff QR codes.", "Verification Required", "error");
                       return;
                     }
                     const inTransit = orders.find(o => o.status === 'In Transit');
                     if (inTransit) {
                       openScanner(inTransit);
                     } else {
-                      alert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.");
+                      triggerAlert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.", "Notice", "info");
                     }
                   }}
                   className="w-full flex items-center justify-between p-4.5 bg-[#059669] hover:bg-[#047857] text-white rounded-2xl shadow-md active:scale-[0.98] transition-all text-left cursor-pointer"
@@ -1977,7 +2013,7 @@ export default function UnifiedDashboard() {
                     <button
                       onClick={() => {
                         if (activeWorkspace?.verificationStatus !== 'Verified') {
-                          alert("Verification Required: Workspace must be Verified to create invoices.");
+                          triggerAlert("Verification Required: Workspace must be Verified to create invoices.", "Verification Required", "error");
                           return;
                         }
                         setIsCreateInvoiceOpen(true);
@@ -2035,7 +2071,7 @@ export default function UnifiedDashboard() {
               {orders.length === 0 ? (
                 renderEmptyState('orders', 'Initialize First Order', () => {
                   if (activeWorkspace?.type === 'merchant') {
-                    alert("Awaiting Distributor to invoice products for your store.");
+                    triggerAlert("Awaiting Distributor to invoice products for your store.", "Notice", "info");
                   } else {
                     setIsCreateInvoiceOpen(true);
                   }
@@ -2557,7 +2593,7 @@ export default function UnifiedDashboard() {
             <button
               onClick={() => {
                 if (activeWorkspace?.verificationStatus !== 'Verified') {
-                  alert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.");
+                  triggerAlert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.", "Verification Required", "error");
                   return;
                 }
                 setIsQuickQrPickerOpen(true);
@@ -2571,14 +2607,14 @@ export default function UnifiedDashboard() {
             <button
               onClick={() => {
                 if (activeWorkspace?.verificationStatus !== 'Verified') {
-                  alert("Verification Required: Workspace must be Verified to scan handoff QR codes.");
+                  triggerAlert("Verification Required: Workspace must be Verified to scan handoff QR codes.", "Verification Required", "error");
                   return;
                 }
                 const inTransit = orders.find(o => o.status === 'In Transit');
                 if (inTransit) {
                   openScanner(inTransit);
                 } else {
-                  alert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.");
+                  triggerAlert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.", "Notice", "info");
                 }
               }}
               className="w-14 h-14 bg-gradient-to-r from-[#059669] to-[#10B981] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all outline-none cursor-pointer"
@@ -3792,6 +3828,47 @@ export default function UnifiedDashboard() {
               </Button>
             </div>
           </form>
+        </div>
+      </Modal>
+
+      {/* SYSTEM ALERT MODAL (RESPONSIVE) */}
+      <Modal
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))}
+        title={alertConfig.title}
+      >
+        <div className="flex flex-col gap-4 text-left p-2">
+          <div className="flex items-start gap-3.5">
+            {alertConfig.type === 'error' && (
+              <div className="w-10 h-10 rounded-full bg-red-50 border border-red-100 flex items-center justify-center shrink-0 text-red-500">
+                <ShieldAlert className="w-5.5 h-5.5" />
+              </div>
+            )}
+            {alertConfig.type === 'success' && (
+              <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 text-emerald-600">
+                <CheckCircle className="w-5.5 h-5.5" />
+              </div>
+            )}
+            {alertConfig.type === 'info' && (
+              <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0 text-blue-500">
+                <AlertCircle className="w-5.5 h-5.5" />
+              </div>
+            )}
+            <div className="flex-1">
+              <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-1">
+                {alertConfig.message}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-2 pt-4 border-t border-[#E5E7EB]">
+            <Button
+              variant="primary"
+              onClick={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))}
+              className="bg-[#059669] hover:bg-[#10B981] text-xs font-bold py-2.5 px-6 rounded-xl cursor-pointer text-white"
+            >
+              Okay, Got it
+            </Button>
+          </div>
         </div>
       </Modal>
 

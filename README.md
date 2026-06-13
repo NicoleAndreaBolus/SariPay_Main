@@ -77,6 +77,17 @@ You can test the entire B2B transaction cycle directly in the browser dashboard:
 
 ---
 
+## 🛡️ Accessing the Admin Portal (Compliance & Audit)
+
+The Admin Portal is a desktop-only dashboard that compliance officers use to audit transactions, resolve active disputes, and verify incoming merchant or distributor onboarding requests.
+
+* **Path to access**: Navigate to `/admin` (e.g., [http://localhost:3000/admin](http://localhost:3000/admin))
+* **Default Credentials**:
+  * **Email**: `admin@saripay.co`
+  * **Password**: `admin`
+
+---
+
 ## 🛠️ Technical Prerequisites
 To build and deploy the smart contracts locally:
 * **Rust** `v1.84.0+`

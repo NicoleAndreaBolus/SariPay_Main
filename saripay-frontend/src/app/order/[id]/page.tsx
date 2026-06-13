@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, ChevronRight, Package, QrCode, ShieldCheck, Sparkles, Truck, Lock } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ChevronRight, Package, QrCode, ShieldCheck, Sparkles, Truck, Lock, ShieldAlert, AlertCircle } from 'lucide-react';
 import { useSariPayContract, Order } from '@/hooks/useSariPayContract';
 import { useStellarWallet } from '@/hooks/useStellarWallet';
 import { Button } from '@/components/common/Button';
@@ -23,6 +23,27 @@ export default function OrderDetailPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [isWorkspaceVerified, setIsWorkspaceVerified] = useState(true);
+
+  const [alertConfig, setAlertConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type: 'info' | 'error' | 'success';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info'
+  });
+
+  const triggerAlert = (message: string, title = 'Notice', type: 'info' | 'error' | 'success' = 'info') => {
+    setAlertConfig({
+      isOpen: true,
+      title,
+      message,
+      type
+    });
+  };
 
   // Authenticate user & check workspace verification status
   useEffect(() => {
@@ -74,7 +95,7 @@ export default function OrderDetailPage() {
   const handleLockEscrow = async () => {
     if (!order) return;
     if (!isWorkspaceVerified) {
-      alert("Verification Required: Your active workspace must be Verified by admin to fund escrows.");
+      triggerAlert("Verification Required: Your active workspace must be Verified by admin to fund escrows.", "Verification Required", "error");
       return;
     }
     setIsFunding(true);
@@ -85,7 +106,7 @@ export default function OrderDetailPage() {
         await wallet.refreshBalance();
       }
     } catch (err: any) {
-      alert(err?.message || "Failed to lock escrow funds.");
+      triggerAlert(err?.message || "Failed to lock escrow funds.", "Error", "error");
     } finally {
       setIsFunding(false);
     }
@@ -109,7 +130,7 @@ export default function OrderDetailPage() {
         });
       }
     } catch (err: any) {
-      alert(err?.message || "Failed to verify supply package.");
+      triggerAlert(err?.message || "Failed to verify supply package.", "Error", "error");
     } finally {
       setIsConfirming(false);
     }
@@ -302,6 +323,47 @@ export default function OrderDetailPage() {
           onScanSuccess={handleScanSuccess}
           expectedValue={order.id}
         />
+      </Modal>
+
+      {/* SYSTEM ALERT MODAL (RESPONSIVE) */}
+      <Modal
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))}
+        title={alertConfig.title}
+      >
+        <div className="flex flex-col gap-4 text-left p-2 text-[#F3F4F6]">
+          <div className="flex items-start gap-3.5">
+            {alertConfig.type === 'error' && (
+              <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 text-red-400">
+                <ShieldAlert className="w-5.5 h-5.5" />
+              </div>
+            )}
+            {alertConfig.type === 'success' && (
+              <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
+                <CheckCircle2 className="w-5.5 h-5.5" />
+              </div>
+            )}
+            {alertConfig.type === 'info' && (
+              <div className="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0 text-blue-400">
+                <AlertCircle className="w-5.5 h-5.5" />
+              </div>
+            )}
+            <div className="flex-1">
+              <p className="text-xs text-gray-300 font-normal leading-relaxed mt-1">
+                {alertConfig.message}
+              </p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-2 pt-4 border-t border-emerald-950/20">
+            <Button
+              variant="primary"
+              onClick={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))}
+              className="bg-emerald-600 hover:bg-emerald-500 text-xs font-bold py-2.5 px-6 rounded-xl cursor-pointer text-white"
+            >
+              Okay, Got it
+            </Button>
+          </div>
+        </div>
       </Modal>
     </main>
   );

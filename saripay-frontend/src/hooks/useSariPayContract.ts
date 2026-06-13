@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Client } from '@/contracts/saripay/src/index';
 import { signTransaction } from '@stellar/freighter-api';
 import { toStroops } from '@/utils/format';
+import { syncWithServer } from '@/utils/sync';
 
 export interface Order {
   id: string;
@@ -36,9 +37,34 @@ export function useSariPayContract() {
     }
   }, []);
 
+  // Listen and poll localStorage for changes from syncs or other tabs/devices
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('saripay_orders');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setOrders(parsed);
+        } catch (e) {
+          // ignore
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    const pollInterval = setInterval(handleStorageChange, 2000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(pollInterval);
+    };
+  }, []);
+
   const saveOrders = (updated: Order[]) => {
     setOrders(updated);
     localStorage.setItem('saripay_orders', JSON.stringify(updated));
+    // Push the changes to the shared server database asynchronously
+    syncWithServer().catch(err => console.error("Failed to sync after saveOrders:", err));
   };
 
   const initOrder = useCallback(async (

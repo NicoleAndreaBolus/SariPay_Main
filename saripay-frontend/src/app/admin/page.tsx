@@ -43,6 +43,7 @@ import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { Modal } from '@/components/common/Modal';
 import { LogoLockup, LogoIcon } from '@/components/common/Logo';
+import { syncWithServer } from '@/utils/sync';
 
 // Interfaces matching system types
 interface Workspace {
@@ -259,133 +260,124 @@ export default function AdminPortal() {
       }
     }
 
-    // Workspaces load
-    const storedWorkspaces = localStorage.getItem('saripay_workspaces');
-    if (storedWorkspaces) {
-      try {
-        const parsed = JSON.parse(storedWorkspaces);
-        // Ensure default properties for mock verifications exist
-        const merged = DEFAULT_WORKSPACES.map(def => {
-          const match = parsed.find((w: Workspace) => w.id === def.id);
-          return match ? { ...def, ...match } : def;
-        });
-        // Append any new user-created workspaces
-        const newWorkspaces = parsed.filter((w: Workspace) => !DEFAULT_WORKSPACES.some(def => def.id === w.id));
-        setWorkspaces([...merged, ...newWorkspaces]);
-      } catch {
+    const loadAndSync = async () => {
+      // First sync with the shared server database to get latest registrations/escrows
+      const synced = await syncWithServer();
+      
+      const storedWorkspaces = localStorage.getItem('saripay_workspaces');
+      if (storedWorkspaces) {
+        try {
+          const parsed = JSON.parse(storedWorkspaces);
+          // Ensure default properties for mock verifications exist
+          const merged = DEFAULT_WORKSPACES.map(def => {
+            const match = parsed.find((w: Workspace) => w.id === def.id);
+            return match ? { ...def, ...match } : def;
+          });
+          // Append any new user-created workspaces
+          const newWorkspaces = parsed.filter((w: Workspace) => !DEFAULT_WORKSPACES.some(def => def.id === w.id));
+          setWorkspaces([...merged, ...newWorkspaces]);
+        } catch {
+          setWorkspaces(DEFAULT_WORKSPACES);
+        }
+      } else {
         setWorkspaces(DEFAULT_WORKSPACES);
-        localStorage.setItem('saripay_workspaces', JSON.stringify(DEFAULT_WORKSPACES));
       }
-    } else {
-      setWorkspaces(DEFAULT_WORKSPACES);
-      localStorage.setItem('saripay_workspaces', JSON.stringify(DEFAULT_WORKSPACES));
-    }
 
-    // Orders load
-    const storedOrders = localStorage.getItem('saripay_orders');
-    if (storedOrders) {
-      try {
-        setOrders(JSON.parse(storedOrders));
-      } catch {
+      // Orders load
+      const storedOrders = localStorage.getItem('saripay_orders');
+      if (storedOrders) {
+        try {
+          setOrders(JSON.parse(storedOrders));
+        } catch {
+          setOrders(DEFAULT_ORDERS);
+        }
+      } else {
         setOrders(DEFAULT_ORDERS);
       }
-    } else {
-      setOrders(DEFAULT_ORDERS);
-      localStorage.setItem('saripay_orders', JSON.stringify(DEFAULT_ORDERS));
-    }
 
-    // Users load
-    const storedUsers = localStorage.getItem('saripay_users');
-    if (storedUsers) {
-      try {
-        setUsers(JSON.parse(storedUsers));
-      } catch {
+      // Users load
+      const storedUsers = localStorage.getItem('saripay_users');
+      if (storedUsers) {
+        try {
+          setUsers(JSON.parse(storedUsers));
+        } catch {
+          setUsers(DEFAULT_USERS);
+        }
+      } else {
         setUsers(DEFAULT_USERS);
       }
-    } else {
-      setUsers(DEFAULT_USERS);
-      localStorage.setItem('saripay_users', JSON.stringify(DEFAULT_USERS));
-    }
 
-    // Disputes load
-    const storedDisputes = localStorage.getItem('saripay_disputes');
-    if (storedDisputes) {
-      try {
-        setDisputes(JSON.parse(storedDisputes));
-      } catch {
+      // Disputes load
+      const storedDisputes = localStorage.getItem('saripay_disputes');
+      if (storedDisputes) {
+        try {
+          setDisputes(JSON.parse(storedDisputes));
+        } catch {
+          setDisputes(DEFAULT_DISPUTES);
+        }
+      } else {
         setDisputes(DEFAULT_DISPUTES);
       }
-    } else {
-      setDisputes(DEFAULT_DISPUTES);
-      localStorage.setItem('saripay_disputes', JSON.stringify(DEFAULT_DISPUTES));
-    }
 
-    // Tickets load
-    const storedTickets = localStorage.getItem('saripay_support_tickets');
-    if (storedTickets) {
-      try {
-        setTickets(JSON.parse(storedTickets));
-      } catch {
+      // Tickets load
+      const storedTickets = localStorage.getItem('saripay_support_tickets');
+      if (storedTickets) {
+        try {
+          setTickets(JSON.parse(storedTickets));
+        } catch {
+          setTickets(DEFAULT_TICKETS);
+        }
+      } else {
         setTickets(DEFAULT_TICKETS);
       }
-    } else {
-      setTickets(DEFAULT_TICKETS);
-      localStorage.setItem('saripay_support_tickets', JSON.stringify(DEFAULT_TICKETS));
-    }
 
-    // Admin Logs load
-    const storedLogs = localStorage.getItem('saripay_admin_logs');
-    if (storedLogs) {
-      try {
-        setAdminLogs(JSON.parse(storedLogs));
-      } catch {
+      // Admin Logs load
+      const storedLogs = localStorage.getItem('saripay_admin_logs');
+      if (storedLogs) {
+        try {
+          setAdminLogs(JSON.parse(storedLogs));
+        } catch {
+          setAdminLogs(DEFAULT_ADMIN_LOGS);
+        }
+      } else {
         setAdminLogs(DEFAULT_ADMIN_LOGS);
       }
-    } else {
-      setAdminLogs(DEFAULT_ADMIN_LOGS);
-      localStorage.setItem('saripay_admin_logs', JSON.stringify(DEFAULT_ADMIN_LOGS));
-    }
+    };
+
+    loadAndSync();
   }, []);
 
   // Periodic LocalStorage syncing loop to capture real-time user-level requests
   useEffect(() => {
     if (!adminSession) return;
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
+      const synced = await syncWithServer();
+      if (!synced) return;
+
       // Workspaces sync
-      const rawW = localStorage.getItem('saripay_workspaces');
-      if (rawW) {
-        try {
-          const parsed = JSON.parse(rawW);
-          // Only update state if length or verification statuses differ to prevent unnecessary renders
-          setWorkspaces(prev => {
-            if (JSON.stringify(prev.map(w => ({ id: w.id, status: w.verificationStatus }))) !==
-                JSON.stringify(parsed.map((w: any) => ({ id: w.id, status: w.verificationStatus })))) {
-              return parsed;
-            }
-            return prev;
-          });
-        } catch {
-          // Ignore
+      setWorkspaces(prev => {
+        if (JSON.stringify(prev.map(w => ({ id: w.id, status: w.verificationStatus }))) !==
+            JSON.stringify(synced.workspaces.map((w: any) => ({ id: w.id, status: w.verificationStatus })))) {
+          return synced.workspaces;
         }
-      }
+        return prev;
+      });
 
       // Orders sync
-      const rawO = localStorage.getItem('saripay_orders');
-      if (rawO) {
-        try {
-          const parsed = JSON.parse(rawO);
-          setOrders(prev => {
-            if (JSON.stringify(prev.map(o => ({ id: o.id, status: o.status }))) !==
-                JSON.stringify(parsed.map((o: any) => ({ id: o.id, status: o.status })))) {
-              return parsed;
-            }
-            return prev;
-          });
-        } catch {
-          // Ignore
+      setOrders(prev => {
+        if (JSON.stringify(prev.map(o => ({ id: o.id, status: o.status }))) !==
+            JSON.stringify(synced.orders.map((o: any) => ({ id: o.id, status: o.status })))) {
+          return synced.orders;
         }
-      }
-    }, 2000);
+        return prev;
+      });
+
+      // Sync remaining tables
+      if (synced.users) setUsers(synced.users);
+      if (synced.disputes) setDisputes(synced.disputes);
+      if (synced.tickets) setTickets(synced.tickets);
+      if (synced.adminLogs) setAdminLogs(synced.adminLogs);
+    }, 3000);
     return () => clearInterval(interval);
   }, [adminSession]);
 
@@ -402,6 +394,8 @@ export default function AdminPortal() {
     const updated = [newLog, ...adminLogs];
     setAdminLogs(updated);
     localStorage.setItem('saripay_admin_logs', JSON.stringify(updated));
+    // Push the compliance or admin changes to the shared server database asynchronously
+    syncWithServer().catch(err => console.error("Failed to sync after addAdminLog:", err));
   };
 
   // Toast helper
@@ -465,9 +459,18 @@ export default function AdminPortal() {
   };
 
   // Reset Demo Configuration
-  const handleResetData = () => {
+  const handleResetData = async () => {
     if (!confirm('Are you sure you want to restore default simulator data? This resets all verifications, disputes, users, and logs.')) return;
     
+    const resetPayload = {
+      workspaces: DEFAULT_WORKSPACES,
+      orders: DEFAULT_ORDERS,
+      users: DEFAULT_USERS,
+      disputes: DEFAULT_DISPUTES,
+      tickets: DEFAULT_TICKETS,
+      adminLogs: DEFAULT_ADMIN_LOGS,
+    };
+
     localStorage.setItem('saripay_workspaces', JSON.stringify(DEFAULT_WORKSPACES));
     localStorage.setItem('saripay_orders', JSON.stringify(DEFAULT_ORDERS));
     localStorage.setItem('saripay_users', JSON.stringify(DEFAULT_USERS));
@@ -481,6 +484,9 @@ export default function AdminPortal() {
     setDisputes(DEFAULT_DISPUTES);
     setTickets(DEFAULT_TICKETS);
     setAdminLogs(DEFAULT_ADMIN_LOGS);
+
+    // Hard reset the server state
+    await syncWithServer(true, resetPayload);
 
     triggerNotification('success', 'Simulator data re-seeded to default defaults successfully.');
     addAdminLog("Simulator Data Reset", "Re-seeded workspaces, orders, and logs to baseline settings.");

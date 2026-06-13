@@ -7,6 +7,7 @@ import { useStellarWallet } from '@/hooks/useStellarWallet';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
 import { LogoIcon } from '@/components/common/Logo';
+import { syncWithServer } from '@/utils/sync';
 import confetti from 'canvas-confetti';
 
 function RegisterForm() {
@@ -66,7 +67,8 @@ function RegisterForm() {
         const initialWorkspace = {
           id: `ws-${workspaceType}-${Date.now()}`,
           name: workspaceName.trim(),
-          type: workspaceType
+          type: workspaceType,
+          verificationStatus: 'Unverified'
         };
 
         const initialWorkspaces = [initialWorkspace];
@@ -75,6 +77,9 @@ function RegisterForm() {
         localStorage.setItem('saripay_active_workspace_id', initialWorkspace.id);
         localStorage.setItem('saripay_auth_role', workspaceType === 'distributor' ? 'supplier' : 'merchant');
         localStorage.setItem('saripay_wallet_balance', '150.00');
+
+        // Sync with the shared server database immediately
+        await syncWithServer();
 
         // Confetti explosion
         confetti({

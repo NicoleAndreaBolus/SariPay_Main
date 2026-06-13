@@ -273,13 +273,16 @@ export default function UnifiedDashboard() {
       if (savedWorkspaces) {
         try {
           const parsed = JSON.parse(savedWorkspaces);
-          setWorkspaces(parsed);
-          if (parsed.length === 0) {
+          // Filter to only display workspaces for the connected wallet (or default mock workspaces if no wallet connected)
+          const userWorkspaces = parsed.filter((w: Workspace) => !w.walletAddress || w.walletAddress === walletAddress);
+          setWorkspaces(userWorkspaces);
+          
+          if (userWorkspaces.length === 0) {
             setIsOnboardingOpen(true);
-          } else if (savedActiveId && parsed.some((w: Workspace) => w.id === savedActiveId)) {
+          } else if (savedActiveId && userWorkspaces.some((w: Workspace) => w.id === savedActiveId)) {
             setActiveWorkspaceId(savedActiveId);
-          } else if (parsed.length > 0) {
-            setActiveWorkspaceId(parsed[0].id);
+          } else if (userWorkspaces.length > 0) {
+            setActiveWorkspaceId(userWorkspaces[0].id);
           }
         } catch {
           initializeDefaultWorkspaces();
@@ -291,7 +294,7 @@ export default function UnifiedDashboard() {
       }
     };
     loadAndSync();
-  }, []);
+  }, [walletAddress]);
 
   const initializeDefaultWorkspaces = () => {
     const defaults: Workspace[] = [];
@@ -366,10 +369,13 @@ export default function UnifiedDashboard() {
     const interval = setInterval(async () => {
       const synced = await syncWithServer();
       if (synced && synced.workspaces) {
+        // Filter synced workspaces to only include this user's workspaces
+        const userSyncedWorkspaces = synced.workspaces.filter((w: any) => !w.walletAddress || w.walletAddress === walletAddress);
+
         setWorkspaces(prevWorkspaces => {
           const activeId = localStorage.getItem('saripay_active_workspace_id') || '';
           const oldActive = prevWorkspaces.find(w => w.id === activeId);
-          const newActive = synced.workspaces.find((w: any) => w.id === activeId);
+          const newActive = userSyncedWorkspaces.find((w: any) => w.id === activeId);
           
           if (oldActive && newActive && oldActive.verificationStatus !== newActive.verificationStatus) {
             if (newActive.verificationStatus === 'Verified') {
@@ -380,13 +386,13 @@ export default function UnifiedDashboard() {
               addNotification("Compliance Info Required", `Compliance requires updates for '${newActive.name}': ${newActive.missingDocs || "Check docs."}`, "warning");
             }
           }
-          return synced.workspaces;
+          return userSyncedWorkspaces;
         });
 
         // Sync active workspace ID
         const savedActiveId = localStorage.getItem('saripay_active_workspace_id');
-        if (!savedActiveId && synced.workspaces.length > 0) {
-          const firstId = synced.workspaces[0].id;
+        if (!savedActiveId && userSyncedWorkspaces.length > 0) {
+          const firstId = userSyncedWorkspaces[0].id;
           setActiveWorkspaceId(firstId);
           localStorage.setItem('saripay_active_workspace_id', firstId);
         } else if (savedActiveId) {
@@ -395,7 +401,7 @@ export default function UnifiedDashboard() {
       }
     }, 3000);
     return () => clearInterval(interval);
-  }, [addNotification]);
+  }, [addNotification, walletAddress]);
 
   const handleWorkspaceSwitch = (id: string) => {
     setActiveWorkspaceId(id);

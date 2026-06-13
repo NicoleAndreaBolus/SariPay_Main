@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 // ExtendsClass JSON storage container details (Free, no account needed, works in serverless)
 const BIN_ID = 'dabdfbb';
 const API_URL = `https://extendsclass.com/api/json-storage/bin/${BIN_ID}`;
@@ -22,6 +24,7 @@ async function readDb() {
       headers: {
         'Cache-Control': 'no-cache',
       },
+      cache: 'no-store', // Crucial to disable Next.js static caching
     });
     if (!res.ok) {
       throw new Error(`Failed to read database: status ${res.status}`);

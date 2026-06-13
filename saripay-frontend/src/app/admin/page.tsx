@@ -354,29 +354,85 @@ export default function AdminPortal() {
       const synced = await syncWithServer();
       if (!synced) return;
 
-      // Workspaces sync
+      // Workspaces sync (merge synced user workspaces with default mock workspaces)
       setWorkspaces(prev => {
+        const merged = DEFAULT_WORKSPACES.map(def => {
+          const match = synced.workspaces.find((w: any) => w.id === def.id);
+          return match ? { ...def, ...match } : def;
+        });
+        const newItems = synced.workspaces.filter((w: any) => !DEFAULT_WORKSPACES.some(def => def.id === w.id));
+        const finalItems = [...merged, ...newItems];
+
         if (JSON.stringify(prev.map(w => ({ id: w.id, status: w.verificationStatus }))) !==
-            JSON.stringify(synced.workspaces.map((w: any) => ({ id: w.id, status: w.verificationStatus })))) {
-          return synced.workspaces;
+            JSON.stringify(finalItems.map((w: any) => ({ id: w.id, status: w.verificationStatus })))) {
+          return finalItems;
         }
         return prev;
       });
 
-      // Orders sync
+      // Orders sync (merge synced user orders with default mock orders)
       setOrders(prev => {
+        const merged = DEFAULT_ORDERS.map(def => {
+          const match = synced.orders.find((o: any) => o.id === def.id);
+          return match ? { ...def, ...match } : def;
+        });
+        const newItems = synced.orders.filter((o: any) => !DEFAULT_ORDERS.some(def => def.id === o.id));
+        const finalItems = [...merged, ...newItems];
+
         if (JSON.stringify(prev.map(o => ({ id: o.id, status: o.status }))) !==
-            JSON.stringify(synced.orders.map((o: any) => ({ id: o.id, status: o.status })))) {
-          return synced.orders;
+            JSON.stringify(finalItems.map((o: any) => ({ id: o.id, status: o.status })))) {
+          return finalItems;
         }
         return prev;
       });
 
-      // Sync remaining tables
-      if (synced.users) setUsers(synced.users);
-      if (synced.disputes) setDisputes(synced.disputes);
-      if (synced.tickets) setTickets(synced.tickets);
-      if (synced.adminLogs) setAdminLogs(synced.adminLogs);
+      // Users sync (merge default mock users with synced users)
+      if (synced.users) {
+        setUsers(prev => {
+          const merged = DEFAULT_USERS.map(def => {
+            const match = synced.users.find((u: any) => u.id === def.id);
+            return match ? { ...def, ...match } : def;
+          });
+          const newItems = synced.users.filter((u: any) => !DEFAULT_USERS.some(def => def.id === u.id));
+          return [...merged, ...newItems];
+        });
+      }
+
+      // Disputes sync (merge default mock disputes with synced disputes)
+      if (synced.disputes) {
+        setDisputes(prev => {
+          const merged = DEFAULT_DISPUTES.map(def => {
+            const match = synced.disputes.find((d: any) => d.id === def.id);
+            return match ? { ...def, ...match } : def;
+          });
+          const newItems = synced.disputes.filter((d: any) => !DEFAULT_DISPUTES.some(def => def.id === d.id));
+          return [...merged, ...newItems];
+        });
+      }
+
+      // Support Tickets sync (merge default mock tickets with synced tickets)
+      if (synced.tickets) {
+        setTickets(prev => {
+          const merged = DEFAULT_TICKETS.map(def => {
+            const match = synced.tickets.find((t: any) => t.id === def.id);
+            return match ? { ...def, ...match } : def;
+          });
+          const newItems = synced.tickets.filter((t: any) => !DEFAULT_TICKETS.some(def => def.id === t.id));
+          return [...merged, ...newItems];
+        });
+      }
+
+      // Admin Logs sync (merge default mock logs with synced logs)
+      if (synced.adminLogs) {
+        setAdminLogs(prev => {
+          const merged = DEFAULT_ADMIN_LOGS.map(def => {
+            const match = synced.adminLogs.find((l: any) => l.id === def.id);
+            return match ? { ...def, ...match } : def;
+          });
+          const newItems = synced.adminLogs.filter((l: any) => !DEFAULT_ADMIN_LOGS.some(def => def.id === l.id));
+          return [...merged, ...newItems];
+        });
+      }
     }, 3000);
     return () => clearInterval(interval);
   }, [adminSession]);

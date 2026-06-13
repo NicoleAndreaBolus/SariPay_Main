@@ -18,24 +18,19 @@ let localMemoryDb: any = {
 
 // Read from the shared cloud database
 async function readDb() {
-  try {
-    const res = await fetch(API_URL, {
-      method: 'GET',
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
-      cache: 'no-store', // Crucial to disable Next.js static caching
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to read database: status ${res.status}`);
-    }
-    const data = await res.json();
-    localMemoryDb = data; // Update in-memory cache
-    return data;
-  } catch (err) {
-    console.error('[JSON DB Serverless] Read error, falling back to memory cache:', err);
-    return localMemoryDb;
+  const res = await fetch(API_URL, {
+    method: 'GET',
+    headers: {
+      'Cache-Control': 'no-cache',
+    },
+    cache: 'no-store', // Crucial to disable Next.js static caching
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to read database: status ${res.status}`);
   }
+  const data = await res.json();
+  localMemoryDb = data; // Update in-memory cache
+  return data;
 }
 
 // Write to the shared cloud database

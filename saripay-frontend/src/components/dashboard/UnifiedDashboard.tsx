@@ -824,6 +824,45 @@ export default function UnifiedDashboard() {
     }
   };
 
+  const handleResetAllSimulatorData = async () => {
+    if (!confirm("Are you sure you want to completely clear the live server database and reset your account? This wipes all test workspaces and users, and cannot be undone.")) {
+      return;
+    }
+    
+    try {
+      // Call the sync API with a reset payload containing empty arrays
+      const res = await fetch(`/api/sync?t=${Date.now()}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+        cache: 'no-store',
+        body: JSON.stringify({
+          isReset: true,
+          workspaces: [],
+          orders: [],
+          users: [],
+          disputes: [],
+          tickets: [],
+          adminLogs: []
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server responded with status ${res.status}`);
+      }
+
+      // Clear local storage and redirect
+      localStorage.clear();
+      window.location.href = '/register';
+    } catch (err: any) {
+      triggerAlert(err?.message || "Failed to reset server data.", "Error", "error");
+    }
+  };
+
   const renderEmptyState = (type: 'orders' | 'deliveries' | 'escrows' | 'notifications', actionLabel?: string, actionFn?: () => void) => {
     const info = {
       orders: {
@@ -3207,29 +3246,45 @@ export default function UnifiedDashboard() {
             
             {/* Tab: Profile */}
             {settingsTab === 'profile' && (
-              <form onSubmit={handleSaveProfile} className="flex flex-col gap-4">
-                <h4 className="text-sm font-bold text-[#111827] uppercase tracking-wider mb-2">User Profile Settings</h4>
-                <Input
-                  label="Full Name"
-                  value={profileName}
-                  onChange={(e) => setProfileName(e.target.value)}
-                  placeholder="e.g. John Santos"
-                  id="profile-name-input"
-                />
-                <Input
-                  label="Primary Contact Email"
-                  value={profileEmail}
-                  onChange={(e) => setProfileEmail(e.target.value)}
-                  placeholder="e.g. john@gmail.com"
-                  id="profile-email-input"
-                />
-                <Button
-                  type="submit"
-                  className="bg-[#059669] hover:bg-[#10B981] text-white text-xs font-bold self-end px-5 py-2 mt-4 rounded-xl cursor-pointer"
-                >
-                  Save Profile
-                </Button>
-              </form>
+              <div className="flex flex-col gap-6">
+                <form onSubmit={handleSaveProfile} className="flex flex-col gap-4">
+                  <h4 className="text-sm font-bold text-[#111827] uppercase tracking-wider mb-2">User Profile Settings</h4>
+                  <Input
+                    label="Full Name"
+                    value={profileName}
+                    onChange={(e) => setProfileName(e.target.value)}
+                    placeholder="e.g. John Santos"
+                    id="profile-name-input"
+                  />
+                  <Input
+                    label="Primary Contact Email"
+                    value={profileEmail}
+                    onChange={(e) => setProfileEmail(e.target.value)}
+                    placeholder="e.g. john@gmail.com"
+                    id="profile-email-input"
+                  />
+                  <Button
+                    type="submit"
+                    className="bg-[#059669] hover:bg-[#10B981] text-white text-xs font-bold self-end px-5 py-2 mt-4 rounded-xl cursor-pointer"
+                  >
+                    Save Profile
+                  </Button>
+                </form>
+
+                <div className="border-t border-[#E5E7EB] pt-6 flex flex-col gap-3">
+                  <h4 className="text-xs font-bold text-red-600 uppercase tracking-wider">Danger Zone</h4>
+                  <p className="text-[11px] text-[#6B7280] leading-relaxed font-normal">
+                    To simulate a brand new registration or clear local testing data from the Vercel live server, click below. This will wipe out all database and device records.
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={handleResetAllSimulatorData}
+                    className="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2.5 px-4.5 rounded-xl border border-red-200/50 self-start cursor-pointer transition-colors"
+                  >
+                    Reset All Server & Client Data
+                  </Button>
+                </div>
+              </div>
             )}
 
             {/* Tab: Security */}

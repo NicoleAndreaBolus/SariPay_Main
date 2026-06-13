@@ -12,10 +12,22 @@ export default function LoginPage() {
   const { walletAddress, isConnecting, debugStatus, linkFreighter, setupPasskey } = useStellarWallet();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // If already logged in, redirect directly to unified dashboard
+  // If already logged in, redirect directly to unified dashboard (or register if new user)
   useEffect(() => {
     if (walletAddress) {
-      router.push('/dashboard');
+      const savedWorkspaces = localStorage.getItem('saripay_workspaces');
+      if (savedWorkspaces) {
+        try {
+          const parsed = JSON.parse(savedWorkspaces);
+          if (parsed && parsed.length > 0) {
+            router.push('/dashboard');
+            return;
+          }
+        } catch (e) {
+          // Ignore
+        }
+      }
+      router.push('/register');
     }
   }, [walletAddress, router]);
 

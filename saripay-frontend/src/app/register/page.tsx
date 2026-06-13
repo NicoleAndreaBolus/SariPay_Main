@@ -32,10 +32,20 @@ function RegisterForm() {
   const [onboardingText, setOnboardingText] = useState('');
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
 
-  // Already logged in guard
+  // Already logged in guard: redirect to dashboard only if they already have a registered workspace
   useEffect(() => {
     if (walletAddress && !isOnboardingProgress) {
-      router.push('/dashboard');
+      const savedWorkspaces = localStorage.getItem('saripay_workspaces');
+      if (savedWorkspaces) {
+        try {
+          const parsed = JSON.parse(savedWorkspaces);
+          if (parsed && parsed.length > 0) {
+            router.push('/dashboard');
+          }
+        } catch (e) {
+          // Ignore parse errors, let them register
+        }
+      }
     }
   }, [walletAddress, router, isOnboardingProgress]);
 

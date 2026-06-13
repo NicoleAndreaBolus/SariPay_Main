@@ -105,7 +105,8 @@ function RegisterForm() {
           name: workspaceName.trim(),
           type: workspaceType,
           verificationStatus: 'Unverified',
-          statusUpdatedAt: Date.now()
+          statusUpdatedAt: Date.now(),
+          walletAddress: address
         };
 
         const initialWorkspaces = [initialWorkspace];

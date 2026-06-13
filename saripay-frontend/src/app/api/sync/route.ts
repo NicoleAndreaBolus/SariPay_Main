@@ -48,7 +48,7 @@ async function writeDb(data: any) {
   }
 }
 
-// Helper to merge items based on unique id
+// Helper to merge items based on unique id (for general collections like orders, users)
 function mergeArrays(serverArray: any[], clientArray: any[], key = 'id') {
   const map = new Map();
   // Load server items
@@ -66,50 +66,6 @@ function mergeArrays(serverArray: any[], clientArray: any[], key = 'id') {
       } else {
         // Merge fields
         let mergedItem = { ...existing, ...item };
-
-        // Handle workspace verificationStatus priorities
-        if (item.type === 'merchant' || item.type === 'distributor') {
-          const sTime = existing.statusUpdatedAt || 0;
-          const cTime = item.statusUpdatedAt || 0;
-
-          if (sTime !== 0 || cTime !== 0) {
-            // If timestamps exist, the newer timestamp wins
-            if (sTime > cTime) {
-              mergedItem.verificationStatus = existing.verificationStatus;
-              mergedItem.rejectionReason = existing.rejectionReason;
-              mergedItem.missingDocs = existing.missingDocs;
-              mergedItem.internalNotes = existing.internalNotes;
-              mergedItem.statusUpdatedAt = existing.statusUpdatedAt;
-            } else {
-              mergedItem.verificationStatus = item.verificationStatus;
-              mergedItem.rejectionReason = item.rejectionReason;
-              mergedItem.missingDocs = item.missingDocs;
-              mergedItem.internalNotes = item.internalNotes;
-              mergedItem.statusUpdatedAt = item.statusUpdatedAt;
-            }
-          } else {
-            // Fallback to index-based comparison if timestamps are missing
-            const sStatus = existing.verificationStatus || 'Unverified';
-            const cStatus = item.verificationStatus || 'Unverified';
-            const statusOrder = [
-              'Unverified',
-              'Pending Review',
-              'Requires Additional Information',
-              'Rejected',
-              'Verified',
-            ];
-            const sIndex = statusOrder.indexOf(sStatus);
-            const cIndex = statusOrder.indexOf(cStatus);
-            if (sIndex > cIndex) {
-              mergedItem.verificationStatus = sStatus;
-              mergedItem.rejectionReason = existing.rejectionReason;
-              mergedItem.missingDocs = existing.missingDocs;
-              mergedItem.internalNotes = existing.internalNotes;
-            } else {
-              mergedItem.verificationStatus = cStatus;
-            }
-          }
-        }
 
         // Handle order status priorities
         if (item.status) {
@@ -136,6 +92,121 @@ function mergeArrays(serverArray: any[], clientArray: any[], key = 'id') {
     }
   }
   return Array.from(map.values());
+}
+
+// Helper to merge fields of a workspace item
+function mergeWorkspaceItem(existing: any, item: any) {
+  let mergedItem = { ...existing, ...item };
+  if (item.type === 'merchant' || item.type === 'distributor') {
+    const sTime = existing.statusUpdatedAt || 0;
+    const cTime = item.statusUpdatedAt || 0;
+
+    if (sTime !== 0 || cTime !== 0) {
+      if (sTime > cTime) {
+        mergedItem.verificationStatus = existing.verificationStatus;
+        mergedItem.rejectionReason = existing.rejectionReason;
+        mergedItem.missingDocs = existing.missingDocs;
+        mergedItem.internalNotes = existing.internalNotes;
+        mergedItem.statusUpdatedAt = existing.statusUpdatedAt;
+      } else {
+        mergedItem.verificationStatus = item.verificationStatus;
+        mergedItem.rejectionReason = item.rejectionReason;
+        mergedItem.missingDocs = item.missingDocs;
+        mergedItem.internalNotes = item.internalNotes;
+        mergedItem.statusUpdatedAt = item.statusUpdatedAt;
+      }
+    } else {
+      const sStatus = existing.verificationStatus || 'Unverified';
+      const cStatus = item.verificationStatus || 'Unverified';
+      const statusOrder = [
+        'Unverified',
+        'Pending Review',
+        'Requires Additional Information',
+        'Rejected',
+        'Verified',
+      ];
+      const sIndex = statusOrder.indexOf(sStatus);
+      const cIndex = statusOrder.indexOf(cStatus);
+      if (sIndex > cIndex) {
+        mergedItem.verificationStatus = sStatus;
+        mergedItem.rejectionReason = existing.rejectionReason;
+        mergedItem.missingDocs = existing.missingDocs;
+        mergedItem.internalNotes = existing.internalNotes;
+      } else {
+        mergedItem.verificationStatus = cStatus;
+      }
+    }
+  }
+  return mergedItem;
+}
+
+// Special workspaces merge helper supporting client-side deletions
+function mergeWorkspaces(serverWorkspaces: any[], clientWorkspaces: any[], clientWalletAddress: string | null, isAdmin: boolean) {
+  const serverMap = new Map();
+  for (const item of serverWorkspaces || []) {
+    if (item && item.id) {
+      serverMap.set(item.id, item);
+    }
+  }
+
+  const clientMap = new Map();
+  for (const item of clientWorkspaces || []) {
+    if (item && item.id) {
+      clientMap.set(item.id, item);
+    }
+  }
+
+  // If client is Admin, the client's list is the absolute source of truth!
+  if (isAdmin) {
+    const result = [];
+    for (const item of clientWorkspaces || []) {
+      if (!item || !item.id) continue;
+      const existing = serverMap.get(item.id);
+      if (existing) {
+        result.push(mergeWorkspaceItem(existing, item));
+      } else {
+        result.push(item);
+      }
+    }
+    return result;
+  }
+
+  // If regular client, merge but respect deletions of their own workspaces.
+  const finalWorkspaces = [];
+
+  // 1. Process server workspaces
+  for (const serverItem of serverWorkspaces || []) {
+    if (!serverItem || !serverItem.id) continue;
+
+    const clientItem = clientMap.get(serverItem.id);
+    const belongsToClient = clientWalletAddress && serverItem.walletAddress === clientWalletAddress;
+
+    if (belongsToClient) {
+      if (clientItem) {
+        // Client still has it, merge it
+        finalWorkspaces.push(mergeWorkspaceItem(serverItem, clientItem));
+      } else {
+        // Client deleted it, skip it (deletes it from server)
+        console.log(`[Sync API] Deleting workspace: ${serverItem.id} belonging to client ${clientWalletAddress}`);
+      }
+    } else {
+      // Belongs to someone else, keep it
+      if (clientItem) {
+        finalWorkspaces.push(mergeWorkspaceItem(serverItem, clientItem));
+      } else {
+        finalWorkspaces.push(serverItem);
+      }
+    }
+  }
+
+  // 2. Add any new workspaces client created
+  for (const clientItem of clientWorkspaces || []) {
+    if (clientItem && clientItem.id && !serverMap.has(clientItem.id)) {
+      finalWorkspaces.push(clientItem);
+    }
+  }
+
+  return finalWorkspaces;
 }
 
 const cacheHeaders = {
@@ -168,10 +239,13 @@ export async function POST(request: Request) {
     }
 
     const currentDb = await readDb();
+    
+    const clientWalletAddress = body.clientWalletAddress || null;
+    const isAdmin = body.isAdmin || false;
 
     // Merge each list
     const mergedDb = {
-      workspaces: mergeArrays(currentDb.workspaces, body.workspaces),
+      workspaces: mergeWorkspaces(currentDb.workspaces, body.workspaces, clientWalletAddress, isAdmin),
       orders: mergeArrays(currentDb.orders, body.orders),
       users: mergeArrays(currentDb.users, body.users),
       disputes: mergeArrays(currentDb.disputes, body.disputes),

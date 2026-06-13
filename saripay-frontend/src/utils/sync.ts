@@ -17,6 +17,8 @@ export async function syncWithServer(isReset = false, customData?: any) {
         disputes: customData.disputes || [],
         tickets: customData.tickets || [],
         adminLogs: customData.adminLogs || [],
+        clientWalletAddress: typeof window !== 'undefined' ? localStorage.getItem('saripay_wallet_address') : null,
+        isAdmin: typeof window !== 'undefined' ? !!localStorage.getItem('saripay_admin_session') : false,
       };
     } else {
       payload = {
@@ -26,6 +28,8 @@ export async function syncWithServer(isReset = false, customData?: any) {
         disputes: JSON.parse(localStorage.getItem('saripay_disputes') || '[]'),
         tickets: JSON.parse(localStorage.getItem('saripay_support_tickets') || '[]'),
         adminLogs: JSON.parse(localStorage.getItem('saripay_admin_logs') || '[]'),
+        clientWalletAddress: typeof window !== 'undefined' ? localStorage.getItem('saripay_wallet_address') : null,
+        isAdmin: typeof window !== 'undefined' ? !!localStorage.getItem('saripay_admin_session') : false,
       };
     }
 

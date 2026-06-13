@@ -435,7 +435,8 @@ export default function UnifiedDashboard() {
       name: newWorkspaceName.trim(),
       type: onboardingType,
       verificationStatus: 'Unverified', // Starts as unverified
-      statusUpdatedAt: Date.now()
+      statusUpdatedAt: Date.now(),
+      walletAddress: walletAddress || undefined
     };
 
     const updated = [...workspaces, newWs];
@@ -821,6 +822,7 @@ export default function UnifiedDashboard() {
         localStorage.setItem('saripay_active_workspace_id', updated[0].id);
       }
       localStorage.setItem('saripay_workspaces', JSON.stringify(updated));
+      syncWithServer().catch(err => console.error("Failed to sync workspace deletion:", err));
     }
   };
 

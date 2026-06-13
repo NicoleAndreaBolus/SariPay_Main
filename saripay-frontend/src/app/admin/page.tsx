@@ -754,6 +754,27 @@ export default function AdminPortal() {
     setSelectedWorkspace(null);
   };
 
+  const handleDeleteWorkspaceAdmin = (wsId: string) => {
+    const target = workspaces.find(w => w.id === wsId);
+    if (!target) return;
+
+    if (!confirm(`Are you sure you want to permanently delete workspace "${target.name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    const updated = workspaces.filter(w => w.id !== wsId);
+    setWorkspaces(updated);
+    localStorage.setItem('saripay_workspaces', JSON.stringify(updated));
+
+    addAdminLog(
+      "Workspace Deleted",
+      `Permanently deleted workspace "${target.name}" from the system.`,
+      target.name
+    );
+
+    triggerNotification('error', `Workspace "${target.name}" has been permanently deleted.`);
+  };
+
   // Actions: DISPUTES RESOLVE FLOW
   const handleResolveDispute = (dispId: string, status: 'Resolved' | 'Closed') => {
     const updated = disputes.map(d => {
@@ -1459,6 +1480,12 @@ export default function AdminPortal() {
                             className="px-2.5 py-1 border border-red-200 bg-red-50 hover:bg-red-100 text-red-800 rounded-lg font-bold"
                           >
                             {ws.verificationStatus === 'Rejected' ? 'Reactivate' : 'Suspend'}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteWorkspaceAdmin(ws.id)}
+                            className="px-2.5 py-1 border border-slate-200 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded-lg font-bold transition-all"
+                          >
+                            Delete
                           </button>
                         </td>
                       </tr>

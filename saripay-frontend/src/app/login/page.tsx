@@ -19,7 +19,8 @@ export default function LoginPage() {
       if (savedWorkspaces) {
         try {
           const parsed = JSON.parse(savedWorkspaces);
-          if (parsed && parsed.length > 0) {
+          const hasUserWorkspace = parsed && parsed.some((w: any) => w.walletAddress === walletAddress);
+          if (hasUserWorkspace) {
             router.push('/dashboard');
             return;
           }

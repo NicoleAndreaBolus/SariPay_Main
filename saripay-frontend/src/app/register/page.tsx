@@ -6,6 +6,7 @@ import { Fingerprint, Sparkles, Store, Truck, ShieldAlert, ArrowRight } from 'lu
 import { useStellarWallet } from '@/hooks/useStellarWallet';
 import { Button } from '@/components/common/Button';
 import { Input } from '@/components/common/Input';
+import { Modal } from '@/components/common/Modal';
 import { LogoIcon } from '@/components/common/Logo';
 import { syncWithServer } from '@/utils/sync';
 import confetti from 'canvas-confetti';
@@ -21,12 +22,15 @@ function RegisterForm() {
   
   // Workspace inputs
   const [workspaceName, setWorkspaceName] = useState('');
+  const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [merchantLocation, setMerchantLocation] = useState('Manila, Philippines');
   const [distributorRegistryId, setDistributorRegistryId] = useState('SEC-REG-1029');
   
   const [formError, setFormError] = useState<string | null>(null);
   const [isOnboardingProgress, setIsOnboardingProgress] = useState(false);
   const [onboardingText, setOnboardingText] = useState('');
+  const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
 
   // Already logged in guard
   useEffect(() => {
@@ -41,15 +45,29 @@ function RegisterForm() {
     setWizardStep('details');
   };
 
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
+  const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
 
+    if (!userName.trim()) {
+      setFormError('Please enter your full name.');
+      return;
+    }
+    if (!userEmail.trim() || !userEmail.includes('@')) {
+      setFormError('Please enter a valid email address.');
+      return;
+    }
     if (!workspaceName.trim()) {
       setFormError('Please enter a business name for your workspace.');
       return;
     }
 
+    // Trigger compliance consent modal before setupPasskey
+    setIsConsentModalOpen(true);
+  };
+
+  const handleConfirmRegister = async () => {
+    setIsConsentModalOpen(false);
     setIsOnboardingProgress(true);
 
     try {
@@ -63,6 +81,24 @@ function RegisterForm() {
       const address = await setupPasskey();
       
       if (address) {
+        // Create User profile in localStorage and Users database
+        const newUser = {
+          id: `USR-${Date.now().toString().slice(-3)}-${Math.floor(Math.random() * 900 + 100)}`,
+          name: userName.trim(),
+          email: userEmail.trim().toLowerCase(),
+          walletAddress: address,
+          workspacesCount: 1,
+          status: 'Active' as const,
+          createdDate: new Date().toISOString().split('T')[0]
+        };
+
+        const existingUsers = JSON.parse(localStorage.getItem('saripay_users') || '[]');
+        const updatedUsers = [...existingUsers.filter((u: any) => u.walletAddress !== address && u.email !== newUser.email), newUser];
+        localStorage.setItem('saripay_users', JSON.stringify(updatedUsers));
+        
+        localStorage.setItem('saripay_profile_name', newUser.name);
+        localStorage.setItem('saripay_profile_email', newUser.email);
+
         // Save workspaces list to LocalStorage
         const initialWorkspace = {
           id: `ws-${workspaceType}-${Date.now()}`,
@@ -208,6 +244,23 @@ function RegisterForm() {
           ) : (
             <div className="flex flex-col gap-4">
               <Input
+                label="Full Name"
+                placeholder="e.g. John Doe"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                id="onboarding-register-user-name"
+              />
+
+              <Input
+                label="Email Address"
+                placeholder="e.g. john@example.com"
+                type="email"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                id="onboarding-register-user-email"
+              />
+
+              <Input
                 label="Workspace Business Name"
                 placeholder={workspaceType === 'merchant' ? "e.g. John's Mini Mart" : "e.g. Santos Distribution"}
                 value={workspaceName}
@@ -272,6 +325,37 @@ function RegisterForm() {
 
         </form>
       )}
+
+      <Modal
+        isOpen={isConsentModalOpen}
+        onClose={() => setIsConsentModalOpen(false)}
+        title="Information Sharing Agreement"
+      >
+        <div className="flex flex-col gap-4 text-stone-600 text-xs leading-relaxed font-sans text-left">
+          <p>
+            In compliance with platform transparency and B2B KYC rules, we require your consent to store and share your business workspace details, full name, and email address with platform compliance administrators.
+          </p>
+          <p className="font-bold text-stone-800">
+            Do you consent to share this profile information and proceed with Passkey registration?
+          </p>
+          <div className="flex justify-end gap-2.5 pt-3.5 border-t border-slate-100 mt-2">
+            <Button
+              variant="ghost"
+              onClick={() => setIsConsentModalOpen(false)}
+              className="py-2 px-4 rounded-xl text-stone-500 font-semibold cursor-pointer text-xs"
+            >
+              No, Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleConfirmRegister}
+              className="bg-[#059669] hover:bg-[#10B981] text-white font-bold py-2 px-4 rounded-xl cursor-pointer text-xs"
+            >
+              Yes, I Consent
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
     </div>
   );

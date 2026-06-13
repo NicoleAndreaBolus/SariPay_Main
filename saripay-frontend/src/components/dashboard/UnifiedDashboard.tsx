@@ -68,6 +68,7 @@ interface Workspace {
   name: string;
   type: 'merchant' | 'distributor';
   verificationStatus?: 'Unverified' | 'Pending Review' | 'Verified' | 'Rejected' | 'Requires Additional Information';
+  statusUpdatedAt?: number;
   ownerName?: string;
   storeAddress?: string;
   warehouseAddress?: string;
@@ -80,6 +81,7 @@ interface Workspace {
   rejectionReason?: string;
   missingDocs?: string;
   internalNotes?: string;
+  walletAddress?: string;
 }
 
 export default function UnifiedDashboard() {
@@ -432,7 +434,8 @@ export default function UnifiedDashboard() {
       id: `ws-${onboardingType}-${Date.now()}`,
       name: newWorkspaceName.trim(),
       type: onboardingType,
-      verificationStatus: 'Unverified' // Starts as unverified
+      verificationStatus: 'Unverified', // Starts as unverified
+      statusUpdatedAt: Date.now()
     };
 
     const updated = [...workspaces, newWs];
@@ -493,6 +496,7 @@ export default function UnifiedDashboard() {
         return {
           ...w,
           verificationStatus: 'Pending Review' as const,
+          statusUpdatedAt: Date.now(),
           ownerName: w.type === 'merchant' ? vOwnerName : undefined,
           contactPerson: w.type === 'distributor' ? vContactPerson : undefined,
           contactNumber: vContactNumber,

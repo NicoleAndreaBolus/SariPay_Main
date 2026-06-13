@@ -51,6 +51,7 @@ interface Workspace {
   name: string;
   type: 'merchant' | 'distributor';
   verificationStatus?: 'Unverified' | 'Pending Review' | 'Verified' | 'Rejected' | 'Requires Additional Information';
+  statusUpdatedAt?: number;
   ownerName?: string;
   storeAddress?: string;
   warehouseAddress?: string;
@@ -603,6 +604,7 @@ export default function AdminPortal() {
         return {
           ...w,
           verificationStatus: 'Verified' as const,
+          statusUpdatedAt: Date.now(),
           rejectionReason: undefined,
           missingDocs: undefined,
           internalNotes: internalNotes.trim() || w.internalNotes
@@ -642,6 +644,7 @@ export default function AdminPortal() {
         return {
           ...w,
           verificationStatus: 'Rejected' as const,
+          statusUpdatedAt: Date.now(),
           rejectionReason: rejectionReason.trim(),
           internalNotes: internalNotes.trim() || w.internalNotes
         };
@@ -673,6 +676,7 @@ export default function AdminPortal() {
         return {
           ...w,
           verificationStatus: 'Requires Additional Information' as const,
+          statusUpdatedAt: Date.now(),
           missingDocs: missingDocs.trim(),
           internalNotes: internalNotes.trim() || w.internalNotes
         };
@@ -730,6 +734,7 @@ export default function AdminPortal() {
         return {
           ...w,
           verificationStatus: nextStatus,
+          statusUpdatedAt: Date.now(),
           rejectionReason: isSuspended ? undefined : "Suspended by Platform Administrator for compliance review."
         };
       }

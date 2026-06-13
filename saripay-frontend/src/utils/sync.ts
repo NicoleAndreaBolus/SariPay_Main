@@ -29,11 +29,15 @@ export async function syncWithServer(isReset = false, customData?: any) {
       };
     }
 
-    const res = await fetch('/api/sync', {
+    const res = await fetch(`/api/sync?t=${Date.now()}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
       },
+      cache: 'no-store',
       body: JSON.stringify(payload),
     });
 

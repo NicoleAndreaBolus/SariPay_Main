@@ -68,7 +68,8 @@ function RegisterForm() {
           id: `ws-${workspaceType}-${Date.now()}`,
           name: workspaceName.trim(),
           type: workspaceType,
-          verificationStatus: 'Unverified'
+          verificationStatus: 'Unverified',
+          statusUpdatedAt: Date.now()
         };
 
         const initialWorkspaces = [initialWorkspace];

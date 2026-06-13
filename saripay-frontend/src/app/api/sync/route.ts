@@ -36,19 +36,15 @@ async function readDb() {
 // Write to the shared cloud database
 async function writeDb(data: any) {
   localMemoryDb = data; // Update in-memory cache
-  try {
-    const res = await fetch(API_URL, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to write database: status ${res.status}`);
-    }
-  } catch (err) {
-    console.error('[JSON DB Serverless] Write error:', err);
+  const res = await fetch(API_URL, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to write database: status ${res.status}`);
   }
 }
 
@@ -73,24 +69,45 @@ function mergeArrays(serverArray: any[], clientArray: any[], key = 'id') {
 
         // Handle workspace verificationStatus priorities
         if (item.type === 'merchant' || item.type === 'distributor') {
-          const sStatus = existing.verificationStatus || 'Unverified';
-          const cStatus = item.verificationStatus || 'Unverified';
-          const statusOrder = [
-            'Unverified',
-            'Pending Review',
-            'Requires Additional Information',
-            'Rejected',
-            'Verified',
-          ];
-          const sIndex = statusOrder.indexOf(sStatus);
-          const cIndex = statusOrder.indexOf(cStatus);
-          if (sIndex > cIndex) {
-            mergedItem.verificationStatus = sStatus;
-            mergedItem.rejectionReason = existing.rejectionReason;
-            mergedItem.missingDocs = existing.missingDocs;
-            mergedItem.internalNotes = existing.internalNotes;
+          const sTime = existing.statusUpdatedAt || 0;
+          const cTime = item.statusUpdatedAt || 0;
+
+          if (sTime !== 0 || cTime !== 0) {
+            // If timestamps exist, the newer timestamp wins
+            if (sTime > cTime) {
+              mergedItem.verificationStatus = existing.verificationStatus;
+              mergedItem.rejectionReason = existing.rejectionReason;
+              mergedItem.missingDocs = existing.missingDocs;
+              mergedItem.internalNotes = existing.internalNotes;
+              mergedItem.statusUpdatedAt = existing.statusUpdatedAt;
+            } else {
+              mergedItem.verificationStatus = item.verificationStatus;
+              mergedItem.rejectionReason = item.rejectionReason;
+              mergedItem.missingDocs = item.missingDocs;
+              mergedItem.internalNotes = item.internalNotes;
+              mergedItem.statusUpdatedAt = item.statusUpdatedAt;
+            }
           } else {
-            mergedItem.verificationStatus = cStatus;
+            // Fallback to index-based comparison if timestamps are missing
+            const sStatus = existing.verificationStatus || 'Unverified';
+            const cStatus = item.verificationStatus || 'Unverified';
+            const statusOrder = [
+              'Unverified',
+              'Pending Review',
+              'Requires Additional Information',
+              'Rejected',
+              'Verified',
+            ];
+            const sIndex = statusOrder.indexOf(sStatus);
+            const cIndex = statusOrder.indexOf(cStatus);
+            if (sIndex > cIndex) {
+              mergedItem.verificationStatus = sStatus;
+              mergedItem.rejectionReason = existing.rejectionReason;
+              mergedItem.missingDocs = existing.missingDocs;
+              mergedItem.internalNotes = existing.internalNotes;
+            } else {
+              mergedItem.verificationStatus = cStatus;
+            }
           }
         }
 
@@ -121,9 +138,15 @@ function mergeArrays(serverArray: any[], clientArray: any[], key = 'id') {
   return Array.from(map.values());
 }
 
+const cacheHeaders = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
 export async function GET() {
   const db = await readDb();
-  return NextResponse.json(db);
+  return NextResponse.json(db, { headers: cacheHeaders });
 }
 
 export async function POST(request: Request) {
@@ -141,7 +164,7 @@ export async function POST(request: Request) {
         adminLogs: body.adminLogs || [],
       };
       await writeDb(resetData);
-      return NextResponse.json(resetData);
+      return NextResponse.json(resetData, { headers: cacheHeaders });
     }
 
     const currentDb = await readDb();
@@ -157,8 +180,8 @@ export async function POST(request: Request) {
     };
 
     await writeDb(mergedDb);
-    return NextResponse.json(mergedDb);
+    return NextResponse.json(mergedDb, { headers: cacheHeaders });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
+    return NextResponse.json({ error: err.message }, { status: 400, headers: cacheHeaders });
   }
 }

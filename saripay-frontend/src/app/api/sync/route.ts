@@ -202,7 +202,14 @@ function mergeWorkspaces(serverWorkspaces: any[], clientWorkspaces: any[], clien
   // 2. Add any new workspaces client created
   for (const clientItem of clientWorkspaces || []) {
     if (clientItem && clientItem.id && !serverMap.has(clientItem.id)) {
-      finalWorkspaces.push(clientItem);
+      // Only treat as a new workspace if it is "Unverified"
+      // If it is already Pending, Verified, etc. and not on the server, it was deleted!
+      const status = clientItem.verificationStatus || 'Unverified';
+      if (status === 'Unverified') {
+        finalWorkspaces.push(clientItem);
+      } else {
+        console.log(`[Sync API] Ignoring deleted workspace ${clientItem.id} sent by client.`);
+      }
     }
   }
 

@@ -23,6 +23,7 @@ export default function OrderDetailPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
   const [isWorkspaceVerified, setIsWorkspaceVerified] = useState(true);
+  const [workspaceType, setWorkspaceType] = useState<'merchant' | 'distributor' | null>(null);
 
   const [alertConfig, setAlertConfig] = useState<{
     isOpen: boolean;
@@ -61,6 +62,7 @@ export default function OrderDetailPage() {
         const active = parsed.find((w: any) => w.id === savedActiveId);
         if (active) {
           setIsWorkspaceVerified(active.verificationStatus === 'Verified');
+          setWorkspaceType(active.type);
         }
       } catch (e) {
         console.error(e);
@@ -277,19 +279,35 @@ export default function OrderDetailPage() {
 
             {order.status === 'Funded' && (
               <div className="flex flex-col gap-4">
-                {/* QR Code display */}
-                <QRGenerator value={order.id} />
-                
-                {/* Release/Scan Action */}
-                <Button
-                  variant="primary"
-                  onClick={() => setIsScanModalOpen(true)}
-                  isLoading={isConfirming}
-                  className="w-full h-12 flex items-center justify-center gap-2"
-                >
-                  <QrCode className="w-5 h-5 text-[#0B1411]" />
-                  Scan Supplier Box Code
-                </Button>
+                {workspaceType === 'distributor' ? (
+                  <>
+                    {/* QR Code display for Distributor to show the Merchant */}
+                    <QRGenerator value={order.id} />
+                    <div className="text-center p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                      <p className="text-xs text-gray-300 font-semibold leading-relaxed">
+                        Show this Handoff QR code to the Merchant. They will scan it using their SariPay wallet to release the locked escrow payment to your account.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Scanner action for Merchant to scan the Distributor's code */}
+                    <div className="text-center p-4 bg-yellow-500/10 rounded-2xl border border-yellow-500/20 mb-2">
+                      <p className="text-xs text-gray-300 font-semibold leading-relaxed">
+                        Scan the distributor's cargo handoff QR code to confirm delivery and authorize releasing the escrow payout on-chain.
+                      </p>
+                    </div>
+                    <Button
+                      variant="primary"
+                      onClick={() => setIsScanModalOpen(true)}
+                      isLoading={isConfirming}
+                      className="w-full h-12 flex items-center justify-center gap-2"
+                    >
+                      <QrCode className="w-5 h-5 text-[#0B1411]" />
+                      Scan Distributor Handoff Code
+                    </Button>
+                  </>
+                )}
               </div>
             )}
 

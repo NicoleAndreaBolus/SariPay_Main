@@ -12,35 +12,35 @@ import { QRScanner } from '@/components/qr/QRScanner';
 import { shortenAddress } from '@/utils/address';
 import confetti from 'canvas-confetti';
 import { syncWithServer } from '@/utils/sync';
-import { 
+import {
   Wallet,
   Home,
-  Store, 
-  Truck, 
-  Lock, 
-  Unlock, 
-  QrCode, 
-  ScanLine, 
-  Activity, 
-  DollarSign, 
-  User, 
-  Settings, 
-  Bell, 
-  HelpCircle, 
-  LogOut, 
-  Plus, 
-  ArrowUpRight, 
-  ChevronDown, 
-  Check, 
-  CheckCircle2, 
-  X, 
-  Menu, 
-  MapPin, 
-  CreditCard, 
-  LockKeyhole, 
-  Fingerprint, 
-  Clock, 
-  ShieldCheck, 
+  Store,
+  Truck,
+  Lock,
+  Unlock,
+  QrCode,
+  ScanLine,
+  Activity,
+  DollarSign,
+  User,
+  Settings,
+  Bell,
+  HelpCircle,
+  LogOut,
+  Plus,
+  ArrowUpRight,
+  ChevronDown,
+  Check,
+  CheckCircle2,
+  X,
+  Menu,
+  MapPin,
+  CreditCard,
+  LockKeyhole,
+  Fingerprint,
+  Clock,
+  ShieldCheck,
   FileText,
   AlertCircle,
   HelpCircle as HelpIcon,
@@ -86,7 +86,7 @@ interface Workspace {
 
 export default function UnifiedDashboard() {
   const router = useRouter();
-  
+
   // Custom hooks
   const wallet = useStellarWallet();
   const { walletAddress, walletBalance, authType, disconnect, refreshBalance } = wallet;
@@ -141,7 +141,7 @@ export default function UnifiedDashboard() {
   // Workspaces list state
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<string>('');
-  
+
   // UI Panels / Modal states
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
@@ -156,19 +156,19 @@ export default function UnifiedDashboard() {
   const [notifFilter, setNotifFilter] = useState<'all' | 'transactions' | 'deliveries' | 'verification' | 'system'>('all');
   const [isMobileOrdersSheetOpen, setIsMobileOrdersSheetOpen] = useState(false);
   const [isQuickQrPickerOpen, setIsQuickQrPickerOpen] = useState(false);
-  
+
   // Onboarding creation state
   const [onboardingStep, setOnboardingStep] = useState<'welcome' | 'selection' | 'details'>('welcome');
   const [onboardingType, setOnboardingType] = useState<'merchant' | 'distributor' | null>(null);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
-  
+
   // Verification submission states
   const [vOwnerName, setVOwnerName] = useState('');
   const [vContactNumber, setVContactNumber] = useState('');
   const [vStoreAddress, setVStoreAddress] = useState('');
   const [vBarangayPermit, setVBarangayPermit] = useState('barangay_permit_2026.pdf');
   const [vBusinessPermit, setVBusinessPermit] = useState('business_permit_2026.pdf');
-  
+
   const [vCompanyName, setVCompanyName] = useState('');
   const [vContactPerson, setVContactPerson] = useState('');
   const [vWarehouseAddress, setVWarehouseAddress] = useState('');
@@ -253,13 +253,13 @@ export default function UnifiedDashboard() {
   // Auto-sync orders with blockchain ledger
   useEffect(() => {
     if (!walletAddress) return;
-    
+
     syncOrders(walletAddress);
-    
+
     const interval = setInterval(() => {
       syncOrders(walletAddress);
     }, 8000);
-    
+
     return () => clearInterval(interval);
   }, [walletAddress, syncOrders]);
 
@@ -269,14 +269,14 @@ export default function UnifiedDashboard() {
       const synced = await syncWithServer();
       const savedWorkspaces = localStorage.getItem('saripay_workspaces');
       const savedActiveId = localStorage.getItem('saripay_active_workspace_id');
-      
+
       if (savedWorkspaces) {
         try {
           const parsed = JSON.parse(savedWorkspaces);
           // Filter to only display workspaces for the connected wallet (or default mock workspaces if no wallet connected)
           const userWorkspaces = parsed.filter((w: Workspace) => !w.walletAddress || w.walletAddress === walletAddress);
           setWorkspaces(userWorkspaces);
-          
+
           if (userWorkspaces.length === 0) {
             setIsOnboardingOpen(true);
           } else if (savedActiveId && userWorkspaces.some((w: Workspace) => w.id === savedActiveId)) {
@@ -376,7 +376,7 @@ export default function UnifiedDashboard() {
           const activeId = localStorage.getItem('saripay_active_workspace_id') || '';
           const oldActive = prevWorkspaces.find(w => w.id === activeId);
           const newActive = userSyncedWorkspaces.find((w: any) => w.id === activeId);
-          
+
           if (oldActive && newActive && oldActive.verificationStatus !== newActive.verificationStatus) {
             if (newActive.verificationStatus === 'Verified') {
               addNotification("Workspace Verified!", `Congratulations! '${newActive.name}' is now fully verified by admin.`, "success");
@@ -407,7 +407,7 @@ export default function UnifiedDashboard() {
     setActiveWorkspaceId(id);
     localStorage.setItem('saripay_active_workspace_id', id);
     setIsSwitcherOpen(false);
-    
+
     // Add light transition feedback
     confetti({
       particleCount: 20,
@@ -452,7 +452,7 @@ export default function UnifiedDashboard() {
     localStorage.setItem('saripay_active_workspace_id', newWs.id);
     // Sync with the shared server database immediately
     syncWithServer().catch(err => console.error("Failed to sync new workspace:", err));
-    
+
     setIsOnboardingOpen(false);
     addNotification("Workspace Created", `Workspace '${newWs.name}' has been successfully created.`, "success");
 
@@ -469,7 +469,7 @@ export default function UnifiedDashboard() {
     setVOwnerName(profileName);
     setVContactNumber('09171234567');
     setVStoreAddress('Manila, Philippines');
-    
+
     setVCompanyName(activeWorkspace?.name || '');
     setVContactPerson(profileName);
     setVWarehouseAddress('Santos Warehouse Hub, Valenzuela City');
@@ -848,7 +848,7 @@ export default function UnifiedDashboard() {
     if (!confirm("Are you sure you want to completely clear the live server database and reset your account? This wipes all test workspaces and users, and cannot be undone.")) {
       return;
     }
-    
+
     try {
       // Call the sync API with a reset payload containing empty arrays
       const res = await fetch(`/api/sync?t=${Date.now()}`, {
@@ -969,905 +969,893 @@ export default function UnifiedDashboard() {
       {/* DESKTOP VIEWPORT */}
       {/* ======================================================== */}
       <div className="hidden md:flex min-h-screen bg-[#FAFAF9] text-[#111827] flex-col font-sans relative w-full">
-      
-      {/* A. DYNAMIC TOP BAR NAVIGATION */}
-      <nav className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm px-6 py-4.5 flex items-center justify-between">
-        
-        {/* Left Side: Brand & Workspace Switcher */}
-        <div className="flex items-center gap-4 relative">
-          <LogoLockup size={34} />
-          
-          <span className="w-px h-6 bg-[#E5E7EB] hidden sm:inline" />
 
-          {/* Workspace Switcher Trigger */}
-          <div className="relative">
-            <button
-              onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
-              className="flex items-center gap-2 bg-[#FAFAF9] hover:bg-[#E5E7EB]/40 border border-[#E5E7EB] px-3.5 py-2 rounded-xl text-xs font-semibold text-[#111827] transition-colors cursor-pointer select-none"
-            >
-              {activeWorkspace?.type === 'merchant' ? (
-                <Store className="w-3.5 h-3.5 text-[#059669]" />
-              ) : (
-                <Truck className="w-3.5 h-3.5 text-[#059669]" />
-              )}
-              <span className="truncate max-w-[120px] sm:max-w-none">{activeWorkspace?.name}</span>
-              <ChevronDown className="w-3 h-3 text-[#6B7280]" />
-            </button>
+        {/* A. DYNAMIC TOP BAR NAVIGATION */}
+        <nav className="sticky top-0 z-40 bg-white border-b border-[#E5E7EB] shadow-sm px-6 py-4.5 flex items-center justify-between">
 
-            {/* Dropdown Options overlay */}
-            {isSwitcherOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setIsSwitcherOpen(false)} />
-                <div className="absolute left-0 mt-2 w-64 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-200">
-                  <div className="px-4 py-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">
-                    Switch Workspace
-                  </div>
-                  
-                  <div className="flex flex-col gap-0.5 max-h-60 overflow-y-auto px-1.5">
-                    {workspaces.map((ws) => (
-                      <button
-                        key={ws.id}
-                        onClick={() => handleWorkspaceSwitch(ws.id)}
-                        className={`flex items-center justify-between w-full text-left px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors ${
-                          activeWorkspaceId === ws.id 
-                            ? 'bg-[#059669]/5 text-[#059669]' 
-                            : 'text-[#6B7280] hover:bg-[#FAFAF9] hover:text-[#111827]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          {ws.type === 'merchant' ? (
-                            <Store className="w-3.5 h-3.5" />
-                          ) : (
-                            <Truck className="w-3.5 h-3.5" />
-                          )}
-                          <span className="truncate max-w-[150px]">{ws.name}</span>
-                        </div>
-                        {activeWorkspaceId === ws.id && <Check className="w-3.5 h-3.5 text-[#059669]" />}
-                      </button>
-                    ))}
-                  </div>
+          {/* Left Side: Brand & Workspace Switcher */}
+          <div className="flex items-center gap-4 relative">
+            <LogoLockup size={34} />
 
-                  <div className="border-t border-[#E5E7EB] mt-2 pt-2 px-1.5">
-                    <button
-                      onClick={handleOpenOnboarding}
-                      className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#059669] hover:bg-[#059669]/5 transition-colors cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Create New Workspace
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
+            <span className="w-px h-6 bg-[#E5E7EB] hidden sm:inline" />
 
-        {/* Right Side Tools menu */}
-        <div className="flex items-center gap-2.5 sm:gap-4">
-          
-          {/* Notifications Trigger */}
-          <div className="relative">
-            <button
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-              className="p-2 text-[#6B7280] hover:text-[#111827] rounded-xl hover:bg-[#FAFAF9] transition-colors relative cursor-pointer"
-            >
-              <Bell className="w-5 h-5" />
-              {notifications.length > 0 && (
-                <span className="absolute top-1.5 right-1.5 bg-[#059669] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white">
-                  {notifications.length}
-                </span>
-              )}
-            </button>
-            
-            {isNotificationsOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setIsNotificationsOpen(false)} />
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-4.5 z-50 text-left animate-in fade-in duration-200">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">Notification Center</h4>
-                    {notifications.length > 0 && (
-                      <button 
-                        onClick={clearAllNotifications}
-                        className="text-[10px] text-red-500 hover:text-red-700 font-semibold cursor-pointer bg-transparent border-0"
-                      >
-                        Clear All
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col gap-3 max-h-64 overflow-y-auto pr-1">
-                    {notifications.length === 0 ? (
-                      <div className="text-center py-6 text-stone-400 text-xs font-medium">
-                        No new notifications
-                      </div>
-                    ) : (
-                      notifications.map(n => (
-                        <div key={n.id} className="flex gap-2.5 items-start text-xs border-b border-[#E5E7EB]/50 pb-2.5 group relative">
-                          <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
-                            n.type === 'success' ? 'bg-emerald-500' :
-                            n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
-                          }`} />
-                          <div className="flex-1 pr-6">
-                            <p className="font-semibold text-[#111827] leading-tight">{n.title}</p>
-                            <p className="text-[#6B7280] mt-0.5 leading-normal text-[11px]">{n.message}</p>
-                            <span className="text-[10px] text-stone-400 mt-1 block font-mono">{n.timestamp}</span>
+            {/* Workspace Switcher Trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setIsSwitcherOpen(!isSwitcherOpen)}
+                className="flex items-center gap-2 bg-[#FAFAF9] hover:bg-[#E5E7EB]/40 border border-[#E5E7EB] px-3.5 py-2 rounded-xl text-xs font-semibold text-[#111827] transition-colors cursor-pointer select-none"
+              >
+                {activeWorkspace?.type === 'merchant' ? (
+                  <Store className="w-3.5 h-3.5 text-[#059669]" />
+                ) : (
+                  <Truck className="w-3.5 h-3.5 text-[#059669]" />
+                )}
+                <span className="truncate max-w-[120px] sm:max-w-none">{activeWorkspace?.name}</span>
+                <ChevronDown className="w-3 h-3 text-[#6B7280]" />
+              </button>
+
+              {/* Dropdown Options overlay */}
+              {isSwitcherOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsSwitcherOpen(false)} />
+                  <div className="absolute left-0 mt-2 w-64 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl py-2 z-50 animate-in fade-in duration-200">
+                    <div className="px-4 py-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-wider">
+                      Switch Workspace
+                    </div>
+
+                    <div className="flex flex-col gap-0.5 max-h-60 overflow-y-auto px-1.5">
+                      {workspaces.map((ws) => (
+                        <button
+                          key={ws.id}
+                          onClick={() => handleWorkspaceSwitch(ws.id)}
+                          className={`flex items-center justify-between w-full text-left px-3 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors ${activeWorkspaceId === ws.id
+                              ? 'bg-[#059669]/5 text-[#059669]'
+                              : 'text-[#6B7280] hover:bg-[#FAFAF9] hover:text-[#111827]'
+                            }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {ws.type === 'merchant' ? (
+                              <Store className="w-3.5 h-3.5" />
+                            ) : (
+                              <Truck className="w-3.5 h-3.5" />
+                            )}
+                            <span className="truncate max-w-[150px]">{ws.name}</span>
                           </div>
-                          <button
-                            onClick={() => deleteNotification(n.id)}
-                            className="absolute right-0 top-1 text-stone-300 hover:text-red-500 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 cursor-pointer bg-transparent border-0"
-                            title="Delete notification"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+                          {activeWorkspaceId === ws.id && <Check className="w-3.5 h-3.5 text-[#059669]" />}
+                        </button>
+                      ))}
+                    </div>
 
-          <button
-            onClick={() => setIsHelpOpen(true)}
-            className="p-2 text-[#6B7280] hover:text-[#111827] rounded-xl hover:bg-[#FAFAF9] transition-colors cursor-pointer"
-          >
-            <HelpCircle className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="p-2 text-[#6B7280] hover:text-[#111827] rounded-xl hover:bg-[#FAFAF9] transition-colors cursor-pointer"
-          >
-            <Settings className="w-5 h-5" />
-          </button>
-
-          {/* Profile User avatar dropdown */}
-          <div className="w-8 h-8 rounded-full bg-[#059669]/10 border border-[#059669]/20 flex items-center justify-center font-bold text-xs text-[#059669]">
-            JS
-          </div>
-
-          <button
-            onClick={handleDisconnect}
-            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors cursor-pointer hidden sm:block"
-            title="Disconnect Wallet"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-
-        </div>
-      </nav>
-
-      {/* B. MAIN DYNAMICS WORKSPACE AREA */}
-      <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
-        
-        {/* Verification Status Banner */}
-        {activeWorkspace && activeWorkspace.verificationStatus !== 'Verified' && (
-          <div className="mb-8 p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-in slide-in-from-top-2 duration-300">
-            <div className="flex items-start gap-3 text-left">
-              {activeWorkspace.verificationStatus === 'Unverified' && (
-                <>
-                  <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#111827]">Workspace Unverified</h4>
-                    <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
-                      Your business details have not been submitted. To fund secure escrows or scan deliveries, please submit your documents for verification.
-                    </p>
-                  </div>
-                </>
-              )}
-              {activeWorkspace.verificationStatus === 'Pending Review' && (
-                <>
-                  <Clock className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 animate-pulse" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#111827]">Verification Pending Review</h4>
-                    <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
-                      Compliance is reviewing your submitted business documentation. Dashboard transaction capabilities will unlock immediately upon approval.
-                    </p>
-                  </div>
-                </>
-              )}
-              {activeWorkspace.verificationStatus === 'Requires Additional Information' && (
-                <>
-                  <ShieldAlert className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#111827]">Additional Compliance Information Required</h4>
-                    <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
-                      Action Required: <span className="font-semibold text-orange-600">{activeWorkspace.missingDocs || "Missing Barangay/SEC permit details"}</span>. Please click below to update details.
-                    </p>
-                  </div>
-                </>
-              )}
-              {activeWorkspace.verificationStatus === 'Rejected' && (
-                <>
-                  <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#111827]">Workspace Verification Rejected</h4>
-                    <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
-                      Reason: <span className="font-semibold text-red-600">{activeWorkspace.rejectionReason || "Details did not match SEC registries."}</span>. Please review rules and resubmit.
-                    </p>
+                    <div className="border-t border-[#E5E7EB] mt-2 pt-2 px-1.5">
+                      <button
+                        onClick={handleOpenOnboarding}
+                        className="flex items-center gap-2 w-full text-left px-3 py-2 rounded-xl text-xs font-semibold text-[#059669] hover:bg-[#059669]/5 transition-colors cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Create New Workspace
+                      </button>
+                    </div>
                   </div>
                 </>
               )}
             </div>
-            {activeWorkspace.verificationStatus !== 'Pending Review' && (
-              <Button
-                variant="primary"
-                onClick={handleOpenVerificationModal}
-                className="bg-[#059669] hover:bg-[#10B981] text-white text-xs font-semibold py-2 px-4.5 rounded-xl shrink-0 cursor-pointer"
-              >
-                {activeWorkspace.verificationStatus === 'Unverified' ? 'Verify Workspace' : 'Update Details'}
-              </Button>
-            )}
           </div>
-        )}
 
-        {/* transition container */}
-        <div className="animate-in fade-in duration-300">
-          
-          {!activeWorkspace && (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="relative mb-6">
-                <div className="absolute inset-0 bg-[#059669]/10 blur-xl rounded-full scale-150 animate-pulse" />
-                <div className="relative w-20 h-20 bg-gradient-to-tr from-[#059669] to-[#10B981] rounded-2xl flex items-center justify-center shadow-lg text-white">
-                  <Store className="w-10 h-10" />
-                </div>
+          {/* Right Side Tools menu */}
+          <div className="flex items-center gap-2.5 sm:gap-4">
+
+            {/* Notifications Trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className="p-2 text-[#6B7280] hover:text-[#111827] rounded-xl hover:bg-[#FAFAF9] transition-colors relative cursor-pointer"
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 bg-[#059669] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+
+              {isNotificationsOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setIsNotificationsOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-80 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl p-4.5 z-50 text-left animate-in fade-in duration-200">
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">Notification Center</h4>
+                      {notifications.length > 0 && (
+                        <button
+                          onClick={clearAllNotifications}
+                          className="text-[10px] text-red-500 hover:text-red-700 font-semibold cursor-pointer bg-transparent border-0"
+                        >
+                          Clear All
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-3 max-h-64 overflow-y-auto pr-1">
+                      {notifications.length === 0 ? (
+                        <div className="text-center py-6 text-stone-400 text-xs font-medium">
+                          No new notifications
+                        </div>
+                      ) : (
+                        notifications.map(n => (
+                          <div key={n.id} className="flex gap-2.5 items-start text-xs border-b border-[#E5E7EB]/50 pb-2.5 group relative">
+                            <span className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${n.type === 'success' ? 'bg-emerald-500' :
+                                n.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'
+                              }`} />
+                            <div className="flex-1 pr-6">
+                              <p className="font-semibold text-[#111827] leading-tight">{n.title}</p>
+                              <p className="text-[#6B7280] mt-0.5 leading-normal text-[11px]">{n.message}</p>
+                              <span className="text-[10px] text-stone-400 mt-1 block font-mono">{n.timestamp}</span>
+                            </div>
+                            <button
+                              onClick={() => deleteNotification(n.id)}
+                              className="absolute right-0 top-1 text-stone-300 hover:text-red-500 p-1 rounded transition-colors opacity-0 group-hover:opacity-100 cursor-pointer bg-transparent border-0"
+                              title="Delete notification"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={() => setIsHelpOpen(true)}
+              className="p-2 text-[#6B7280] hover:text-[#111827] rounded-xl hover:bg-[#FAFAF9] transition-colors cursor-pointer"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="p-2 text-[#6B7280] hover:text-[#111827] rounded-xl hover:bg-[#FAFAF9] transition-colors cursor-pointer"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+
+            {/* Profile User avatar dropdown */}
+            <div className="w-8 h-8 rounded-full bg-[#059669]/10 border border-[#059669]/20 flex items-center justify-center font-bold text-xs text-[#059669]">
+              JS
+            </div>
+
+            <button
+              onClick={handleDisconnect}
+              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-colors cursor-pointer hidden sm:block"
+              title="Disconnect Wallet"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+
+          </div>
+        </nav>
+
+        {/* B. MAIN DYNAMICS WORKSPACE AREA */}
+        <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+
+          {/* Verification Status Banner */}
+          {activeWorkspace && activeWorkspace.verificationStatus !== 'Verified' && (
+            <div className="mb-8 p-4 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-in slide-in-from-top-2 duration-300">
+              <div className="flex items-start gap-3 text-left">
+                {activeWorkspace.verificationStatus === 'Unverified' && (
+                  <>
+                    <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-bold text-[#111827]">Workspace Unverified</h4>
+                      <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
+                        Your business details have not been submitted. To fund secure escrows or scan deliveries, please submit your documents for verification.
+                      </p>
+                    </div>
+                  </>
+                )}
+                {activeWorkspace.verificationStatus === 'Pending Review' && (
+                  <>
+                    <Clock className="w-5 h-5 text-amber-500 shrink-0 mt-0.5 animate-pulse" />
+                    <div>
+                      <h4 className="text-sm font-bold text-[#111827]">Verification Pending Review</h4>
+                      <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
+                        Compliance is reviewing your submitted business documentation. Dashboard transaction capabilities will unlock immediately upon approval.
+                      </p>
+                    </div>
+                  </>
+                )}
+                {activeWorkspace.verificationStatus === 'Requires Additional Information' && (
+                  <>
+                    <ShieldAlert className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-bold text-[#111827]">Additional Compliance Information Required</h4>
+                      <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
+                        Action Required: <span className="font-semibold text-orange-600">{activeWorkspace.missingDocs || "Missing Barangay/SEC permit details"}</span>. Please click below to update details.
+                      </p>
+                    </div>
+                  </>
+                )}
+                {activeWorkspace.verificationStatus === 'Rejected' && (
+                  <>
+                    <XCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-bold text-[#111827]">Workspace Verification Rejected</h4>
+                      <p className="text-xs text-[#6B7280] font-normal leading-relaxed mt-0.5">
+                        Reason: <span className="font-semibold text-red-600">{activeWorkspace.rejectionReason || "Details did not match SEC registries."}</span>. Please review rules and resubmit.
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
-              
-              <h2 className="text-3xl font-extrabold tracking-tight text-[#111827] sm:text-4xl">
-                Welcome to <span className="bg-gradient-to-r from-[#059669] to-[#10B981] bg-clip-text text-transparent">SariPay</span>
-              </h2>
-              <p className="mt-3 max-w-md text-base text-[#6B7280] font-normal leading-relaxed">
-                Connect your business to the secure, blockchain-powered B2B commerce network. Create your first workspace to start creating orders and funding escrows.
-              </p>
-              
-              <div className="mt-8 flex gap-4">
+              {activeWorkspace.verificationStatus !== 'Pending Review' && (
                 <Button
                   variant="primary"
-                  onClick={handleOpenOnboarding}
-                  className="bg-gradient-to-r from-[#059669] to-[#10B981] hover:from-[#10B981] hover:to-[#059669] text-white text-sm font-semibold py-3.5 px-8 rounded-2xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
+                  onClick={handleOpenVerificationModal}
+                  className="bg-[#059669] hover:bg-[#10B981] text-white text-xs font-semibold py-2 px-4.5 rounded-xl shrink-0 cursor-pointer"
                 >
-                  <Plus className="w-5 h-5" />
-                  Create First Workspace
+                  {activeWorkspace.verificationStatus === 'Unverified' ? 'Verify Workspace' : 'Update Details'}
                 </Button>
-              </div>
+              )}
             </div>
           )}
 
-          {/* ======================================================== */}
-          {/* B.1 MERCHANT VIEWPORT */}
-          {/* ======================================================== */}
-          {activeWorkspace?.type === 'merchant' && (
-            <div className="flex flex-col gap-10">
-              
-              {/* Hero welcome header */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-[#E5E7EB]">
-                <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-[#111827]">Welcome Back, {firstName}</h1>
-                  <p className="text-sm text-[#6B7280] font-medium mt-1">
-                    Secure Payments. Verified Deliveries.
-                  </p>
+          {/* transition container */}
+          <div className="animate-in fade-in duration-300">
+
+            {!activeWorkspace && (
+              <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-[#059669]/10 blur-xl rounded-full scale-150 animate-pulse" />
+                  <div className="relative w-20 h-20 bg-gradient-to-tr from-[#059669] to-[#10B981] rounded-2xl flex items-center justify-center shadow-lg text-white">
+                    <Store className="w-10 h-10" />
+                  </div>
                 </div>
-                
-                <div className="flex gap-2">
+
+                <h2 className="text-3xl font-extrabold tracking-tight text-[#111827] sm:text-4xl">
+                  Welcome to <span className="bg-gradient-to-r from-[#059669] to-[#10B981] bg-clip-text text-transparent">SariPay</span>
+                </h2>
+                <p className="mt-3 max-w-md text-base text-[#6B7280] font-normal leading-relaxed">
+                  Connect your business to the secure, blockchain-powered B2B commerce network. Create your first workspace to start creating orders and funding escrows.
+                </p>
+
+                <div className="mt-8 flex gap-4">
                   <Button
-                    variant="secondary"
-                    onClick={resetMockData}
-                    className="flex items-center gap-2 border border-[#E5E7EB] bg-white text-xs font-semibold py-2 px-4 rounded-xl"
+                    variant="primary"
+                    onClick={handleOpenOnboarding}
+                    className="bg-gradient-to-r from-[#059669] to-[#10B981] hover:from-[#10B981] hover:to-[#059669] text-white text-sm font-semibold py-3.5 px-8 rounded-2xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-2"
                   >
-                    <Database className="w-4 h-4" />
-                    Reset Mock Ledger
+                    <Plus className="w-5 h-5" />
+                    Create First Workspace
                   </Button>
                 </div>
               </div>
+            )}
 
-              {/* Metrics cards grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Available Balance</span>
-                    {activeWorkspace?.verificationStatus !== 'Verified' && (
-                      <span className="text-[9px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-bold border border-amber-200/50 flex items-center gap-1 animate-pulse shrink-0">
-                        <Lock className="w-2.5 h-2.5" /> Locked
-                      </span>
+            {/* ======================================================== */}
+            {/* B.1 MERCHANT VIEWPORT */}
+            {/* ======================================================== */}
+            {activeWorkspace?.type === 'merchant' && (
+              <div className="flex flex-col gap-10">
+
+                {/* Hero welcome header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-[#E5E7EB]">
+                  <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#111827]">Welcome Back, {firstName}</h1>
+                    <p className="text-sm text-[#6B7280] font-medium mt-1">
+                      Secure Payments. Verified Deliveries.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      onClick={resetMockData}
+                      className="flex items-center gap-2 border border-[#E5E7EB] bg-white text-xs font-semibold py-2 px-4 rounded-xl"
+                    >
+                      <Database className="w-4 h-4" />
+                      Reset Mock Ledger
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Metrics cards grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Available Balance</span>
+                      {activeWorkspace?.verificationStatus !== 'Verified' && (
+                        <span className="text-[9px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-bold border border-amber-200/50 flex items-center gap-1 animate-pulse shrink-0">
+                          <Lock className="w-2.5 h-2.5" /> Locked
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-2xl font-extrabold text-[#111827] block mt-2">
+                      ₱{activeWorkspace?.verificationStatus === 'Verified' && walletBalance
+                        ? (parseFloat(walletBalance) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        : "0.00"}
+                    </span>
+                    <span className="text-[9px] text-[#6B7280] block font-mono">
+                      {activeWorkspace?.verificationStatus === 'Verified' && walletBalance ? walletBalance : "0.00"} XLM
+                    </span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border-2 border-[#059669]/20 shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Funds In Trust</span>
+                    <span className="text-2xl font-extrabold text-[#059669] block mt-2">₱{(parseFloat(merchantStats.lockedFunds) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="text-[9px] text-[#059669] block font-mono font-bold">{merchantStats.lockedFunds} XLM Escrowed</span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Active Orders</span>
+                    <span className="text-2xl font-extrabold text-[#111827] block mt-2">{merchantStats.activeOrders}</span>
+                    <span className="text-[9px] text-amber-600 font-bold block">Fulfillment pending</span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Completed Deliveries</span>
+                    <span className="text-2xl font-extrabold text-[#111827] block mt-2">{merchantStats.completedDeliveries}</span>
+                    <span className="text-[9px] text-[#059669] font-bold block">100% release success</span>
+                  </div>
+                </div>
+
+                {/* Purchase Matrix Table & Handoff Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                  {/* Active Purchase Queue (Left Column) */}
+                  <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-6 w-full">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex items-center gap-4 flex-wrap">
+                        <h3 className="text-base font-bold text-[#111827]">Active Purchase Queue</h3>
+                        <form onSubmit={handleImportOrder} className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={importOrderId}
+                            onChange={(e) => setImportOrderId(e.target.value)}
+                            placeholder="Import Order ID..."
+                            className="px-3 py-1.5 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:border-emerald-500 font-mono w-32"
+                          />
+                          <button
+                            type="submit"
+                            disabled={isImporting}
+                            className="px-3 py-1.5 text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
+                          >
+                            {isImporting ? 'Importing...' : 'Import'}
+                          </button>
+                        </form>
+                      </div>
+                      <div className="flex bg-[#E5E7EB]/40 p-1 rounded-xl border border-[#E5E7EB]/50 gap-1 text-[11px] font-bold">
+                        {(['All', 'Awaiting Transit', 'Ready to Release'] as const).map(tab => (
+                          <button
+                            key={tab}
+                            onClick={() => setMerchantTab(tab)}
+                            className={`px-3 py-1.5 rounded-lg cursor-pointer ${merchantTab === tab ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#111827]'
+                              }`}
+                          >
+                            {tab}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {merchantOrders.length > 0 ? (
+                      <div className="overflow-x-auto">
+
+                        {/* Desktop Queue Table */}
+                        <table className="w-full text-left border-collapse hidden sm:table">
+                          <thead>
+                            <tr className="border-b border-[#E5E7EB] text-[#6B7280] text-[10px] font-bold tracking-wider uppercase pb-3">
+                              <th className="pb-3.5">Order ID</th>
+                              <th className="pb-3.5">Supplier</th>
+                              <th className="pb-3.5">Amount</th>
+                              <th className="pb-3.5">Status</th>
+                              <th className="pb-3.5 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]/60 text-xs">
+                            {merchantOrders.map(order => (
+                              <tr key={order.id} className="hover:bg-[#FAFAF9]/50 transition-colors">
+                                <td className="py-4 font-mono font-bold text-[#059669]">#{order.id}</td>
+                                <td className="py-4">
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-[#111827]">{order.supplier}</span>
+                                    <span className="text-[10px] text-[#6B7280] mt-0.5">{order.details}</span>
+                                  </div>
+                                </td>
+                                <td className="py-4 font-bold text-[#111827]">{order.amount} XLM</td>
+                                <td className="py-4">{getStatusBadge(order.status)}</td>
+                                <td className="py-4 text-right">
+                                  {order.status === 'Initialized' ? (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => handleLockEscrow(order.id, order.amount)}
+                                      isLoading={fundingId === order.id}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                                          ? 'bg-[#059669] hover:bg-[#10B981] text-white'
+                                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                                        }`}
+                                    >
+                                      Fund Escrow
+                                    </Button>
+                                  ) : (order.status === 'Funded' || order.status === 'In Transit') ? (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => openScanner(order)}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className={`text-[11px] font-semibold py-1.5 px-3 rounded-lg cursor-pointer animate-pulse ${activeWorkspace.verificationStatus === 'Verified'
+                                          ? 'bg-[#059669] hover:bg-[#10B981] text-white'
+                                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                                        }`}
+                                    >
+                                      Scan Delivery QR
+                                    </Button>
+                                  ) : (
+                                    <span className="text-[10px] text-[#059669] font-bold">✓ Settled</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+
+                        {/* Responsive Card Stack for Mobile Screens */}
+                        <div className="flex flex-col gap-4 sm:hidden">
+                          {merchantOrders.map(order => (
+                            <div key={order.id} className="border border-[#E5E7EB] p-4.5 rounded-xl bg-[#FAFAF9]/30 flex flex-col gap-3">
+                              <div className="flex justify-between items-center">
+                                <span className="font-mono font-bold text-[#059669] text-xs">#{order.id}</span>
+                                {getStatusBadge(order.status)}
+                              </div>
+                              <div>
+                                <p className="font-bold text-[#111827] text-xs">{order.supplier}</p>
+                                <p className="text-[10px] text-[#6B7280] mt-0.5 leading-relaxed">{order.details}</p>
+                              </div>
+                              <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1">
+                                <span className="font-bold text-[#111827] text-xs">{order.amount} XLM</span>
+                                <div>
+                                  {order.status === 'Initialized' ? (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => handleLockEscrow(order.id, order.amount)}
+                                      isLoading={fundingId === order.id}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className="bg-[#059669] text-[11px]"
+                                    >
+                                      Fund Escrow
+                                    </Button>
+                                  ) : (order.status === 'Funded' || order.status === 'In Transit') ? (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => openScanner(order)}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className="bg-[#059669] text-white text-[11px] font-semibold"
+                                    >
+                                      Scan Delivery QR
+                                    </Button>
+                                  ) : (
+                                    <span className="text-[10px] text-[#059669] font-bold">✓ Settled</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                      </div>
+                    ) : (
+                      <div className="py-16 text-center border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center p-6">
+                        <AlertCircle className="w-8 h-8 text-[#6B7280] mb-3" />
+                        <h4 className="text-sm font-bold text-[#111827] mb-1">No active orders yet.</h4>
+                        <p className="text-xs text-[#6B7280] max-w-sm mb-4">You have settled all invoices. Wait for your suppliers to send new order invoices.</p>
+                        <Button
+                          variant="primary"
+                          onClick={() => triggerAlert("Please request your wholesale supplier to send an order invoice. Or fund existing balances.", "Notice", "info")}
+                          className="bg-[#059669] text-xs font-semibold py-2 px-4 rounded-xl"
+                        >
+                          Contact Supplier
+                        </Button>
+                      </div>
                     )}
                   </div>
-                  <span className="text-2xl font-extrabold text-[#111827] block mt-2">
-                    ₱{activeWorkspace?.verificationStatus === 'Verified' && walletBalance 
-                      ? (parseFloat(walletBalance) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
-                      : "0.00"}
-                  </span>
-                  <span className="text-[9px] text-[#6B7280] block font-mono">
-                    {activeWorkspace?.verificationStatus === 'Verified' && walletBalance ? walletBalance : "0.00"} XLM
-                  </span>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border-2 border-[#059669]/20 shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Funds In Trust</span>
-                  <span className="text-2xl font-extrabold text-[#059669] block mt-2">₱{(parseFloat(merchantStats.lockedFunds) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  <span className="text-[9px] text-[#059669] block font-mono font-bold">{merchantStats.lockedFunds} XLM Escrowed</span>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Active Orders</span>
-                  <span className="text-2xl font-extrabold text-[#111827] block mt-2">{merchantStats.activeOrders}</span>
-                  <span className="text-[9px] text-amber-600 font-bold block">Fulfillment pending</span>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Completed Deliveries</span>
-                  <span className="text-2xl font-extrabold text-[#111827] block mt-2">{merchantStats.completedDeliveries}</span>
-                  <span className="text-[9px] text-[#059669] font-bold block">100% release success</span>
-                </div>
-              </div>
 
-              {/* Purchase Matrix Table & Handoff Layout */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* Active Purchase Queue (Left Column) */}
-                <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-6 w-full">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <h3 className="text-base font-bold text-[#111827]">Active Purchase Queue</h3>
-                      <form onSubmit={handleImportOrder} className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={importOrderId}
-                          onChange={(e) => setImportOrderId(e.target.value)}
-                          placeholder="Import Order ID..."
-                          className="px-3 py-1.5 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:border-emerald-500 font-mono w-32"
-                        />
-                        <button
-                          type="submit"
-                          disabled={isImporting}
-                          className="px-3 py-1.5 text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
-                        >
-                          {isImporting ? 'Importing...' : 'Import'}
-                        </button>
-                      </form>
-                    </div>
-                    <div className="flex bg-[#E5E7EB]/40 p-1 rounded-xl border border-[#E5E7EB]/50 gap-1 text-[11px] font-bold">
-                      {(['All', 'Awaiting Transit', 'Ready to Release'] as const).map(tab => (
-                        <button
-                          key={tab}
-                          onClick={() => setMerchantTab(tab)}
-                          className={`px-3 py-1.5 rounded-lg cursor-pointer ${
-                            merchantTab === tab ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#111827]'
-                          }`}
-                        >
-                          {tab}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  {/* QR Code Handoff & Quick Actions Panel (Right Column) */}
+                  <div className="lg:col-span-4 flex flex-col gap-8 w-full">
 
-                  {merchantOrders.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      
-                      {/* Desktop Queue Table */}
-                      <table className="w-full text-left border-collapse hidden sm:table">
-                        <thead>
-                          <tr className="border-b border-[#E5E7EB] text-[#6B7280] text-[10px] font-bold tracking-wider uppercase pb-3">
-                            <th className="pb-3.5">Order ID</th>
-                            <th className="pb-3.5">Supplier</th>
-                            <th className="pb-3.5">Amount</th>
-                            <th className="pb-3.5">Status</th>
-                            <th className="pb-3.5 text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#E5E7EB]/60 text-xs">
-                          {merchantOrders.map(order => (
-                            <tr key={order.id} className="hover:bg-[#FAFAF9]/50 transition-colors">
-                              <td className="py-4 font-mono font-bold text-[#059669]">#{order.id}</td>
-                              <td className="py-4">
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-[#111827]">{order.supplier}</span>
-                                  <span className="text-[10px] text-[#6B7280] mt-0.5">{order.details}</span>
-                                </div>
-                              </td>
-                              <td className="py-4 font-bold text-[#111827]">{order.amount} XLM</td>
-                              <td className="py-4">{getStatusBadge(order.status)}</td>
-                              <td className="py-4 text-right">
-                                {order.status === 'Initialized' ? (
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => handleLockEscrow(order.id, order.amount)}
-                                    isLoading={fundingId === order.id}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${
-                                      activeWorkspace.verificationStatus === 'Verified'
-                                        ? 'bg-[#059669] hover:bg-[#10B981] text-white'
-                                        : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                    }`}
-                                  >
-                                    Fund Escrow
-                                  </Button>
-                                ) : (order.status === 'Funded' || order.status === 'In Transit') ? (
-                                  <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => openQrModal(order)}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className={`border text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${
-                                      activeWorkspace.verificationStatus === 'Verified'
-                                        ? 'border-[#E5E7EB] hover:bg-stone-50 text-[#111827]'
-                                        : 'border-stone-200 text-stone-400 bg-stone-50 cursor-not-allowed'
-                                    }`}
-                                  >
-                                    Generate QR
-                                  </Button>
-                                ) : (
-                                  <span className="text-[10px] text-[#059669] font-bold">✓ Settled</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                    {/* Generate QR Module card */}
+                    <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col items-center text-center">
+                      <QrCode className="w-8 h-8 text-[#059669] mb-3" />
+                      <h3 className="text-sm font-bold text-[#111827] mb-1">Generate Delivery QR</h3>
+                      <p className="text-xs text-[#6B7280] max-w-xs mb-5">
+                        Verify physical deliveries by generating a secure on-chain QR check. Show it to your driver on arrival.
+                      </p>
 
-                      {/* Responsive Card Stack for Mobile Screens */}
-                      <div className="flex flex-col gap-4 sm:hidden">
-                        {merchantOrders.map(order => (
-                          <div key={order.id} className="border border-[#E5E7EB] p-4.5 rounded-xl bg-[#FAFAF9]/30 flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                              <span className="font-mono font-bold text-[#059669] text-xs">#{order.id}</span>
-                              {getStatusBadge(order.status)}
-                            </div>
-                            <div>
-                              <p className="font-bold text-[#111827] text-xs">{order.supplier}</p>
-                              <p className="text-[10px] text-[#6B7280] mt-0.5 leading-relaxed">{order.details}</p>
-                            </div>
-                            <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1">
-                              <span className="font-bold text-[#111827] text-xs">{order.amount} XLM</span>
-                              <div>
-                                {order.status === 'Initialized' ? (
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => handleLockEscrow(order.id, order.amount)}
-                                    isLoading={fundingId === order.id}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className="bg-[#059669] text-[11px]"
-                                  >
-                                    Fund Escrow
-                                  </Button>
-                                ) : (order.status === 'Funded' || order.status === 'In Transit') ? (
-                                  <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => openQrModal(order)}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className="border border-[#E5E7EB] text-[11px]"
-                                  >
-                                    Generate QR
-                                  </Button>
-                                ) : (
-                                  <span className="text-[10px] text-[#059669] font-bold">✓ Settled</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="w-full bg-[#FAFAF9] border border-[#E5E7EB] p-4 rounded-xl flex flex-col items-center gap-3">
+                        <div className="w-32 h-32 bg-white border border-[#E5E7EB] p-2.5 rounded-lg flex items-center justify-center">
+                          <QrCode className="w-full h-full text-stone-300" />
+                        </div>
+                        <span className="text-[10px] text-[#6B7280] font-semibold">NO ACTIVE VERIFICATION QR CODE</span>
                       </div>
 
-                    </div>
-                  ) : (
-                    <div className="py-16 text-center border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center p-6">
-                      <AlertCircle className="w-8 h-8 text-[#6B7280] mb-3" />
-                      <h4 className="text-sm font-bold text-[#111827] mb-1">No active orders yet.</h4>
-                      <p className="text-xs text-[#6B7280] max-w-sm mb-4">You have settled all invoices. Wait for your suppliers to send new order invoices.</p>
                       <Button
                         variant="primary"
-                        onClick={() => triggerAlert("Please request your wholesale supplier to send an order invoice. Or fund existing balances.", "Notice", "info")}
-                        className="bg-[#059669] text-xs font-semibold py-2 px-4 rounded-xl"
+                        disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                        onClick={() => {
+                          const funded = orders.find(o => o.status === 'Funded' || o.status === 'In Transit');
+                          if (funded) {
+                            openQrModal(funded);
+                          } else {
+                            triggerAlert("No funded escrow orders available to verify. Please fund an order first.", "Notice", "info");
+                          }
+                        }}
+                        className={`text-xs font-bold w-full py-3.5 mt-5 rounded-xl cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                            ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
+                            : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
+                          }`}
                       >
-                        Contact Supplier
+                        Generate QR
                       </Button>
                     </div>
-                  )}
-                </div>
 
-                {/* QR Code Handoff & Quick Actions Panel (Right Column) */}
-                <div className="lg:col-span-4 flex flex-col gap-8 w-full">
-                  
-                  {/* Generate QR Module card */}
-                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col items-center text-center">
-                    <QrCode className="w-8 h-8 text-[#059669] mb-3" />
-                    <h3 className="text-sm font-bold text-[#111827] mb-1">Generate Delivery QR</h3>
-                    <p className="text-xs text-[#6B7280] max-w-xs mb-5">
-                      Verify physical deliveries by generating a secure on-chain QR check. Show it to your driver on arrival.
-                    </p>
-                    
-                    <div className="w-full bg-[#FAFAF9] border border-[#E5E7EB] p-4 rounded-xl flex flex-col items-center gap-3">
-                      <div className="w-32 h-32 bg-white border border-[#E5E7EB] p-2.5 rounded-lg flex items-center justify-center">
-                        <QrCode className="w-full h-full text-stone-300" />
+                    {/* Merchant Quick Actions */}
+                    <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-4.5">
+                      <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">Merchant Quick Actions</h4>
+                      <div className="flex flex-col gap-2.5">
+                        <button
+                          onClick={() => {
+                            if (activeWorkspace.verificationStatus !== 'Verified') {
+                              triggerAlert("Verification Required: Workspace must be Verified to fund escrows.", "Verification Required", "error");
+                              return;
+                            }
+                            const init = orders.find(o => o.status === 'Initialized');
+                            if (init) handleLockEscrow(init.id, init.amount);
+                            else triggerAlert("No initialized orders. Ask your supplier to create one.", "Notice", "info");
+                          }}
+                          className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
+                        >
+                          <span>Fund Escrow</span>
+                          <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
+                        </button>
+                        <button
+                          onClick={() => triggerAlert("Wallet Activity Log: Settle on Stellar testnet Horizonal ledger.", "Wallet Activity", "info")}
+                          className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
+                        >
+                          <span>Wallet Activity</span>
+                          <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
+                        </button>
+                        <button
+                          onClick={() => setIsHelpOpen(true)}
+                          className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
+                        >
+                          <span>Support Desk</span>
+                          <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
+                        </button>
                       </div>
-                      <span className="text-[10px] text-[#6B7280] font-semibold">NO ACTIVE VERIFICATION QR CODE</span>
                     </div>
 
+                  </div>
+
+                </div>
+
+              </div>
+            )}
+
+            {/* ======================================================== */}
+            {/* B.2 DISTRIBUTOR VIEWPORT */}
+            {/* ======================================================== */}
+            {activeWorkspace?.type === 'distributor' && (
+              <div className="flex flex-col gap-10">
+
+                {/* Hero welcome header */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-[#E5E7EB]">
+                  <div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#111827]">{activeWorkspace?.name} Dashboard</h1>
+                    <p className="text-sm text-[#6B7280] font-medium mt-1">
+                      Secure Payments. Verified Deliveries.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 w-full sm:w-auto justify-end">
                     <Button
-                      variant="primary"
-                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                      variant="secondary"
+                      onClick={resetMockData}
+                      className="flex items-center gap-2 border border-[#E5E7EB] bg-white text-xs font-semibold py-2 px-4 rounded-xl cursor-pointer"
+                    >
+                      <Database className="w-4 h-4" />
+                      Reset Mock Ledger
+                    </Button>
+                    <Button
                       onClick={() => {
-                        const funded = orders.find(o => o.status === 'Funded' || o.status === 'In Transit');
-                        if (funded) {
-                          openQrModal(funded);
-                        } else {
-                          triggerAlert("No funded escrow orders available to verify. Please fund an order first.", "Notice", "info");
+                        if (activeWorkspace.verificationStatus !== 'Verified') {
+                          triggerAlert("Verification Required: Distributor workspace must be Verified to initialize purchase invoices.", "Verification Required", "error");
+                          return;
                         }
+                        setIsCreateInvoiceOpen(true);
                       }}
-                      className={`text-xs font-bold w-full py-3.5 mt-5 rounded-xl cursor-pointer ${
-                        activeWorkspace.verificationStatus === 'Verified'
+                      className={`flex items-center gap-2 text-xs font-bold py-2 px-4.5 rounded-xl cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
                           ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
                           : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
-                      }`}
-                    >
-                      Generate QR
-                    </Button>
-                  </div>
-
-                  {/* Merchant Quick Actions */}
-                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-4.5">
-                    <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">Merchant Quick Actions</h4>
-                    <div className="flex flex-col gap-2.5">
-                      <button 
-                        onClick={() => {
-                          if (activeWorkspace.verificationStatus !== 'Verified') {
-                            triggerAlert("Verification Required: Workspace must be Verified to fund escrows.", "Verification Required", "error");
-                            return;
-                          }
-                          const init = orders.find(o => o.status === 'Initialized');
-                          if (init) handleLockEscrow(init.id, init.amount);
-                          else triggerAlert("No initialized orders. Ask your supplier to create one.", "Notice", "info");
-                        }}
-                        className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
-                      >
-                        <span>Fund Escrow</span>
-                        <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
-                      </button>
-                      <button
-                        onClick={() => triggerAlert("Wallet Activity Log: Settle on Stellar testnet Horizonal ledger.", "Wallet Activity", "info")}
-                        className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
-                      >
-                        <span>Wallet Activity</span>
-                        <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
-                      </button>
-                      <button
-                        onClick={() => setIsHelpOpen(true)}
-                        className="flex items-center justify-between w-full text-left px-4 py-3 bg-[#FAFAF9] hover:bg-stone-100/60 rounded-xl text-xs font-semibold text-[#111827] border border-[#E5E7EB] cursor-pointer transition-colors"
-                      >
-                        <span>Support Desk</span>
-                        <ChevronDown className="w-3.5 h-3.5 -rotate-90 text-[#6B7280]" />
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* B.2 DISTRIBUTOR VIEWPORT */}
-          {/* ======================================================== */}
-          {activeWorkspace?.type === 'distributor' && (
-            <div className="flex flex-col gap-10">
-              
-              {/* Hero welcome header */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-[#E5E7EB]">
-                <div>
-                  <h1 className="text-3xl font-extrabold tracking-tight text-[#111827]">{activeWorkspace?.name} Dashboard</h1>
-                  <p className="text-sm text-[#6B7280] font-medium mt-1">
-                    Secure Payments. Verified Deliveries.
-                  </p>
-                </div>
-                
-                <div className="flex gap-2 w-full sm:w-auto justify-end">
-                  <Button
-                    variant="secondary"
-                    onClick={resetMockData}
-                    className="flex items-center gap-2 border border-[#E5E7EB] bg-white text-xs font-semibold py-2 px-4 rounded-xl cursor-pointer"
-                  >
-                    <Database className="w-4 h-4" />
-                    Reset Mock Ledger
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (activeWorkspace.verificationStatus !== 'Verified') {
-                        triggerAlert("Verification Required: Distributor workspace must be Verified to initialize purchase invoices.", "Verification Required", "error");
-                        return;
-                      }
-                      setIsCreateInvoiceOpen(true);
-                    }}
-                    className={`flex items-center gap-2 text-xs font-bold py-2 px-4.5 rounded-xl cursor-pointer ${
-                      activeWorkspace.verificationStatus === 'Verified'
-                        ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
-                        : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
-                    }`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Create Invoice Order
-                  </Button>
-                </div>
-              </div>
-
-              {/* Metrics cards grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Guaranteed Revenue</span>
-                  <span className="text-2xl font-extrabold text-[#059669] block mt-2">₱{(parseFloat(distributorStats.guaranteedRevenue) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  <span className="text-[9px] text-[#6B7280] block font-mono">{distributorStats.guaranteedRevenue} XLM Escrowed</span>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Pending Deliveries</span>
-                  <span className="text-2xl font-extrabold text-[#111827] block mt-2">{distributorStats.pendingDeliveries}</span>
-                  <span className="text-[9px] text-amber-600 font-bold block">Escrow funded</span>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Completed Deliveries</span>
-                  <span className="text-2xl font-extrabold text-[#111827] block mt-2">{distributorStats.completedDeliveries}</span>
-                  <span className="text-[9px] text-[#059669] font-bold block">Payouts released on-chain</span>
-                </div>
-                <div className="bg-white p-6 rounded-2xl border-2 border-[#059669]/20 shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
-                  <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Average Settlement Time</span>
-                  <span className="text-2xl font-extrabold text-[#059669] block mt-2">Instant</span>
-                  <span className="text-[9px] text-[#059669] font-bold block">Stellar Network speeds</span>
-                </div>
-              </div>
-
-              {/* Invoices grid & QR scanner card */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                {/* Revenue Assurance Panel (Left Column) */}
-                <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-6 w-full">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h3 className="text-base font-bold text-[#111827]">Revenue Assurance Panel</h3>
-                    <div className="flex bg-[#E5E7EB]/40 p-1 rounded-xl border border-[#E5E7EB]/50 gap-1 text-[11px] font-bold">
-                      {(['All', 'Awaiting Escrow', 'Ready to Dispatch', 'Completed'] as const).map(tab => (
-                        <button
-                          key={tab}
-                          onClick={() => setDistributorTab(tab)}
-                          className={`px-3 py-1.5 rounded-lg cursor-pointer ${
-                            distributorTab === tab ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#111827]'
-                          }`}
-                        >
-                          {tab}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {distributorOrders.length > 0 ? (
-                    <div className="overflow-x-auto">
-                      
-                      {/* Desktop Table View */}
-                      <table className="w-full text-left border-collapse hidden sm:table">
-                        <thead>
-                          <tr className="border-b border-[#E5E7EB] text-[#6B7280] text-[10px] font-bold tracking-wider uppercase pb-3">
-                            <th className="pb-3.5">Order ID</th>
-                            <th className="pb-3.5">Store / Address</th>
-                            <th className="pb-3.5">Amount</th>
-                            <th className="pb-3.5">Escrow Status</th>
-                            <th className="pb-3.5 text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#E5E7EB]/60 text-xs">
-                          {distributorOrders.map(order => (
-                            <tr key={order.id} className="hover:bg-[#FAFAF9]/50 transition-colors">
-                              <td className="py-4 font-mono font-bold text-[#059669]">#{order.id}</td>
-                              <td className="py-4">
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-[#111827]">{order.merchantName || "Brad's Sari-Sari Store"}</span>
-                                  <span className="text-[10px] text-[#6B7280] mt-0.5 flex items-center gap-1">
-                                    <MapPin className="w-3 h-3 text-[#6B7280] shrink-0" />
-                                    {order.merchantAddress || "Tondo, Manila"}
-                                  </span>
-                                  <span className="text-[10px] text-stone-400 mt-1 font-sans">{order.details}</span>
-                                </div>
-                              </td>
-                              <td className="py-4 font-bold text-[#111827]">{order.amount} XLM</td>
-                              <td className="py-4">{getStatusBadge(order.status)}</td>
-                              <td className="py-4 text-right">
-                                {order.status === 'Initialized' ? (
-                                  <span className="text-[11px] text-amber-600 font-semibold">Awaiting Deposit</span>
-                                ) : order.status === 'Funded' ? (
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => handleShipOrder(order.id)}
-                                    isLoading={isShippingId === order.id}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${
-                                      activeWorkspace.verificationStatus === 'Verified'
-                                        ? 'bg-[#059669] hover:bg-[#10B981] text-white'
-                                        : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                    }`}
-                                  >
-                                    Ship Order
-                                  </Button>
-                                ) : order.status === 'In Transit' ? (
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => openScanner(order)}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className={`text-[11px] font-bold py-1.5 px-3 rounded-lg cursor-pointer animate-pulse ${
-                                      activeWorkspace.verificationStatus === 'Verified'
-                                        ? 'bg-[#059669] hover:bg-[#10B981] text-white'
-                                        : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                    }`}
-                                  >
-                                    Scan QR code
-                                  </Button>
-                                ) : (
-                                  <span className="text-[11px] text-[#059669] font-bold">✓ Settled</span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
- 
-                      {/* stacked cards for mobile view */}
-                      <div className="flex flex-col gap-4 sm:hidden">
-                        {distributorOrders.map(order => (
-                          <div key={order.id} className="border border-[#E5E7EB] p-4.5 rounded-xl bg-[#FAFAF9]/30 flex flex-col gap-3">
-                            <div className="flex justify-between items-center">
-                              <span className="font-mono font-bold text-[#059669] text-xs">#{order.id}</span>
-                              {getStatusBadge(order.status)}
-                            </div>
-                            <div>
-                              <p className="font-bold text-[#111827] text-xs">{order.merchantName || "Store Merchant"}</p>
-                              <p className="text-[10px] text-[#6B7280] mt-0.5 leading-relaxed">{order.details}</p>
-                              <p className="text-[9px] text-stone-400 mt-1 flex items-center gap-1 font-mono">
-                                <MapPin className="w-3 h-3 text-stone-300" />
-                                {order.merchantAddress || "Tondo, Manila"}
-                              </p>
-                            </div>
-                            <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1">
-                              <span className="font-bold text-[#111827] text-xs">{order.amount} XLM</span>
-                              <div>
-                                {order.status === 'Initialized' ? (
-                                  <span className="text-xs text-amber-600 font-semibold">Awaiting Deposit</span>
-                                ) : order.status === 'Funded' ? (
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => handleShipOrder(order.id)}
-                                    isLoading={isShippingId === order.id}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className="bg-[#059669] text-[11px]"
-                                  >
-                                    Ship Order
-                                  </Button>
-                                ) : order.status === 'In Transit' ? (
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => openScanner(order)}
-                                    disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                    className="bg-[#059669] text-[11px] font-bold"
-                                  >
-                                    Scan QR
-                                  </Button>
-                                ) : (
-                                  <span className="text-xs text-[#059669] font-bold">✓ Settled</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
- 
-                    </div>
-                  ) : (
-                    <div className="py-16 text-center border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center p-6">
-                      <AlertCircle className="w-8 h-8 text-[#6B7280] mb-3" />
-                      <h4 className="text-sm font-bold text-[#111827] mb-1">No deliveries scheduled.</h4>
-                      <p className="text-xs text-[#6B7280] max-w-sm mb-4">No invoice transactions are currently active in this selection.</p>
-                      <Button
-                        variant="primary"
-                        onClick={() => {
-                          if (activeWorkspace.verificationStatus !== 'Verified') {
-                            triggerAlert("Verification Required: Workspace must be Verified to create order invoices.", "Verification Required", "error");
-                            return;
-                          }
-                          setIsCreateInvoiceOpen(true);
-                        }}
-                        className={`text-xs font-semibold py-2 px-4 rounded-xl ${
-                          activeWorkspace.verificationStatus === 'Verified'
-                            ? 'bg-[#059669] text-white hover:bg-[#10B981]'
-                            : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
                         }`}
-                      >
-                        Create Invoice
-                      </Button>
-                    </div>
-                  )}
-                </div>
- 
-                {/* QR Scanner Hub Panel (Right Column) */}
-                <div className="lg:col-span-4 flex flex-col gap-8 w-full">
-                  
-                  {/* Scanner interface card */}
-                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col items-center text-center">
-                    <ScanLine className="w-8 h-8 text-[#059669] mb-3" />
-                    <h3 className="text-sm font-bold text-[#111827] mb-1">QR Scanner Hub</h3>
-                    <p className="text-xs text-[#6B7280] max-w-xs mb-5">
-                      Verify physical handoffs at merchant stores to release locked payments on the blockchain.
-                    </p>
-                    
-                    <div className="w-full bg-[#FAFAF9] border border-[#E5E7EB] p-4 rounded-xl flex flex-col items-center gap-3">
-                      <div className="w-32 h-32 bg-white border border-[#E5E7EB] rounded-lg flex flex-col items-center justify-center relative overflow-hidden">
-                        <ScanLine className="w-10 h-10 text-stone-300" />
-                      </div>
-                      <span className="text-[10px] text-[#6B7280] font-semibold">CAMERA READY FOR HANDOFF</span>
-                    </div>
- 
-                    <Button
-                      variant="primary"
-                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                      onClick={() => {
-                        const inTransit = orders.find(o => o.status === 'In Transit');
-                        if (inTransit) {
-                          openScanner(inTransit);
-                        } else {
-                          triggerAlert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.", "Notice", "info");
-                        }
-                      }}
-                      className={`text-xs font-bold w-full py-3.5 mt-5 rounded-xl cursor-pointer ${
-                        activeWorkspace.verificationStatus === 'Verified'
-                          ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
-                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
-                      }`}
                     >
-                      Open Scanner
+                      <Plus className="w-4 h-4" />
+                      Create Invoice Order
                     </Button>
                   </div>
- 
-                  {/* Delivery Route Operations checklist panel */}
-                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
-                    <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">Logistics Dispatch Checklist</h4>
-                    <ul className="flex flex-col gap-3 text-xs text-[#6B7280] font-normal">
-                      <li className="flex gap-2 items-start">
-                        <span className="w-4 h-4 rounded bg-[#059669]/10 text-[#059669] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
-                        <span>Confirm invoice order details match merchant inventory.</span>
-                      </li>
-                      <li className="flex gap-2 items-start">
-                        <span className="w-4 h-4 rounded bg-[#059669]/10 text-[#059669] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
-                        <span>Ensure the merchant has funded the escrow before loading vehicle.</span>
-                      </li>
-                      <li className="flex gap-2 items-start">
-                        <span className="w-4 h-4 rounded bg-[#059669]/10 text-[#059669] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
-                        <span>Scan the merchant's QR check during physical handoff.</span>
-                      </li>
-                    </ul>
-                  </div>
- 
                 </div>
- 
+
+                {/* Metrics cards grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Guaranteed Revenue</span>
+                    <span className="text-2xl font-extrabold text-[#059669] block mt-2">₱{(parseFloat(distributorStats.guaranteedRevenue) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="text-[9px] text-[#6B7280] block font-mono">{distributorStats.guaranteedRevenue} XLM Escrowed</span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Pending Deliveries</span>
+                    <span className="text-2xl font-extrabold text-[#111827] block mt-2">{distributorStats.pendingDeliveries}</span>
+                    <span className="text-[9px] text-amber-600 font-bold block">Escrow funded</span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Completed Deliveries</span>
+                    <span className="text-2xl font-extrabold text-[#111827] block mt-2">{distributorStats.completedDeliveries}</span>
+                    <span className="text-[9px] text-[#059669] font-bold block">Payouts released on-chain</span>
+                  </div>
+                  <div className="bg-white p-6 rounded-2xl border-2 border-[#059669]/20 shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
+                    <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-wider block">Average Settlement Time</span>
+                    <span className="text-2xl font-extrabold text-[#059669] block mt-2">Instant</span>
+                    <span className="text-[9px] text-[#059669] font-bold block">Stellar Network speeds</span>
+                  </div>
+                </div>
+
+                {/* Invoices grid & QR scanner card */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+                  {/* Revenue Assurance Panel (Left Column) */}
+                  <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-6 w-full">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <h3 className="text-base font-bold text-[#111827]">Revenue Assurance Panel</h3>
+                      <div className="flex bg-[#E5E7EB]/40 p-1 rounded-xl border border-[#E5E7EB]/50 gap-1 text-[11px] font-bold">
+                        {(['All', 'Awaiting Escrow', 'Ready to Dispatch', 'Completed'] as const).map(tab => (
+                          <button
+                            key={tab}
+                            onClick={() => setDistributorTab(tab)}
+                            className={`px-3 py-1.5 rounded-lg cursor-pointer ${distributorTab === tab ? 'bg-white text-[#111827] shadow-sm' : 'text-[#6B7280] hover:text-[#111827]'
+                              }`}
+                          >
+                            {tab}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {distributorOrders.length > 0 ? (
+                      <div className="overflow-x-auto">
+
+                        {/* Desktop Table View */}
+                        <table className="w-full text-left border-collapse hidden sm:table">
+                          <thead>
+                            <tr className="border-b border-[#E5E7EB] text-[#6B7280] text-[10px] font-bold tracking-wider uppercase pb-3">
+                              <th className="pb-3.5">Order ID</th>
+                              <th className="pb-3.5">Store / Address</th>
+                              <th className="pb-3.5">Amount</th>
+                              <th className="pb-3.5">Escrow Status</th>
+                              <th className="pb-3.5 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[#E5E7EB]/60 text-xs">
+                            {distributorOrders.map(order => (
+                              <tr key={order.id} className="hover:bg-[#FAFAF9]/50 transition-colors">
+                                <td className="py-4 font-mono font-bold text-[#059669]">#{order.id}</td>
+                                <td className="py-4">
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-[#111827]">{order.merchantName || "Brad's Sari-Sari Store"}</span>
+                                    <span className="text-[10px] text-[#6B7280] mt-0.5 flex items-center gap-1">
+                                      <MapPin className="w-3 h-3 text-[#6B7280] shrink-0" />
+                                      {order.merchantAddress || "Tondo, Manila"}
+                                    </span>
+                                    <span className="text-[10px] text-stone-400 mt-1 font-sans">{order.details}</span>
+                                  </div>
+                                </td>
+                                <td className="py-4 font-bold text-[#111827]">{order.amount} XLM</td>
+                                <td className="py-4">{getStatusBadge(order.status)}</td>
+                                <td className="py-4 text-right">
+                                  {order.status === 'Initialized' ? (
+                                    <span className="text-[11px] text-amber-600 font-semibold">Awaiting Deposit</span>
+                                  ) : order.status === 'Funded' ? (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => handleShipOrder(order.id)}
+                                      isLoading={isShippingId === order.id}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                                          ? 'bg-[#059669] hover:bg-[#10B981] text-white'
+                                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                                        }`}
+                                    >
+                                      Ship Order
+                                    </Button>
+                                  ) : order.status === 'In Transit' ? (
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      onClick={() => openQrModal(order)}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className={`border text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                                          ? 'border-[#E5E7EB] hover:bg-stone-50 text-[#111827]'
+                                          : 'border-stone-200 text-stone-400 bg-stone-50 cursor-not-allowed'
+                                        }`}
+                                    >
+                                      Show Handoff QR
+                                    </Button>
+                                  ) : (
+                                    <span className="text-[11px] text-[#059669] font-bold">✓ Settled</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+
+                        {/* stacked cards for mobile view */}
+                        <div className="flex flex-col gap-4 sm:hidden">
+                          {distributorOrders.map(order => (
+                            <div key={order.id} className="border border-[#E5E7EB] p-4.5 rounded-xl bg-[#FAFAF9]/30 flex flex-col gap-3">
+                              <div className="flex justify-between items-center">
+                                <span className="font-mono font-bold text-[#059669] text-xs">#{order.id}</span>
+                                {getStatusBadge(order.status)}
+                              </div>
+                              <div>
+                                <p className="font-bold text-[#111827] text-xs">{order.merchantName || "Store Merchant"}</p>
+                                <p className="text-[10px] text-[#6B7280] mt-0.5 leading-relaxed">{order.details}</p>
+                                <p className="text-[9px] text-stone-400 mt-1 flex items-center gap-1 font-mono">
+                                  <MapPin className="w-3 h-3 text-stone-300" />
+                                  {order.merchantAddress || "Tondo, Manila"}
+                                </p>
+                              </div>
+                              <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1">
+                                <span className="font-bold text-[#111827] text-xs">{order.amount} XLM</span>
+                                <div>
+                                  {order.status === 'Initialized' ? (
+                                    <span className="text-xs text-amber-600 font-semibold">Awaiting Deposit</span>
+                                  ) : order.status === 'Funded' ? (
+                                    <Button
+                                      variant="primary"
+                                      size="sm"
+                                      onClick={() => handleShipOrder(order.id)}
+                                      isLoading={isShippingId === order.id}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className="bg-[#059669] text-[11px]"
+                                    >
+                                      Ship Order
+                                    </Button>
+                                  ) : order.status === 'In Transit' ? (
+                                    <Button
+                                      variant="secondary"
+                                      size="sm"
+                                      onClick={() => openQrModal(order)}
+                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                      className="border border-[#E5E7EB] text-[11px] font-semibold"
+                                    >
+                                      Show QR
+                                    </Button>
+                                  ) : (
+                                    <span className="text-xs text-[#059669] font-bold">✓ Settled</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                      </div>
+                    ) : (
+                      <div className="py-16 text-center border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center p-6">
+                        <AlertCircle className="w-8 h-8 text-[#6B7280] mb-3" />
+                        <h4 className="text-sm font-bold text-[#111827] mb-1">No deliveries scheduled.</h4>
+                        <p className="text-xs text-[#6B7280] max-w-sm mb-4">No invoice transactions are currently active in this selection.</p>
+                        <Button
+                          variant="primary"
+                          onClick={() => {
+                            if (activeWorkspace.verificationStatus !== 'Verified') {
+                              triggerAlert("Verification Required: Workspace must be Verified to create order invoices.", "Verification Required", "error");
+                              return;
+                            }
+                            setIsCreateInvoiceOpen(true);
+                          }}
+                          className={`text-xs font-semibold py-2 px-4 rounded-xl ${activeWorkspace.verificationStatus === 'Verified'
+                              ? 'bg-[#059669] text-white hover:bg-[#10B981]'
+                              : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                            }`}
+                        >
+                          Create Invoice
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* QR Scanner Hub Panel (Right Column) */}
+                  <div className="lg:col-span-4 flex flex-col gap-8 w-full">
+
+                    {/* Scanner interface card */}
+                    <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col items-center text-center">
+                      <ScanLine className="w-8 h-8 text-[#059669] mb-3" />
+                      <h3 className="text-sm font-bold text-[#111827] mb-1">QR Scanner Hub</h3>
+                      <p className="text-xs text-[#6B7280] max-w-xs mb-5">
+                        Verify physical handoffs at merchant stores to release locked payments on the blockchain.
+                      </p>
+
+                      <div className="w-full bg-[#FAFAF9] border border-[#E5E7EB] p-4 rounded-xl flex flex-col items-center gap-3">
+                        <div className="w-32 h-32 bg-white border border-[#E5E7EB] rounded-lg flex flex-col items-center justify-center relative overflow-hidden">
+                          <QrCode className="w-10 h-10 text-stone-300 animate-pulse" />
+                        </div>
+                        <span className="text-[10px] text-[#6B7280] font-semibold">QR READY FOR HANDOFF</span>
+                      </div>
+
+                      <Button
+                        variant="secondary"
+                        disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                        onClick={() => {
+                          const inTransit = orders.find(o => o.status === 'In Transit');
+                          if (inTransit) {
+                            openQrModal(inTransit);
+                          } else {
+                            triggerAlert("No 'In Transit' orders available to show QR. Set an order status to 'Ship Order' first.", "Notice", "info");
+                          }
+                        }}
+                        className={`text-xs font-bold w-full py-3.5 mt-5 rounded-xl cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                            ? 'border-[#E5E7EB] hover:bg-stone-50 text-[#111827]'
+                            : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
+                          }`}
+                      >
+                        Show Handoff QR
+                      </Button>
+                    </div>
+
+                    {/* Delivery Route Operations checklist panel */}
+                    <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-4">
+                      <h4 className="text-xs font-bold text-[#111827] uppercase tracking-wider">Logistics Dispatch Checklist</h4>
+                      <ul className="flex flex-col gap-3 text-xs text-[#6B7280] font-normal">
+                        <li className="flex gap-2 items-start">
+                          <span className="w-4 h-4 rounded bg-[#059669]/10 text-[#059669] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">1</span>
+                          <span>Confirm invoice order details match merchant inventory.</span>
+                        </li>
+                        <li className="flex gap-2 items-start">
+                          <span className="w-4 h-4 rounded bg-[#059669]/10 text-[#059669] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">2</span>
+                          <span>Ensure the merchant has funded the escrow before loading vehicle.</span>
+                        </li>
+                        <li className="flex gap-2 items-start">
+                          <span className="w-4 h-4 rounded bg-[#059669]/10 text-[#059669] flex items-center justify-center font-bold text-[10px] shrink-0 mt-0.5">3</span>
+                          <span>Scan the merchant's QR check during physical handoff.</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                  </div>
+
+                </div>
+
               </div>
- 
-            </div>
-          )}
- 
+            )}
+
+          </div>
+
         </div>
- 
       </div>
-      </div>
- 
+
       {/* ======================================================== */}
       {/* MOBILE VIEWPORT */}
       {/* ======================================================== */}
       <div className="flex md:hidden min-h-screen bg-[#FAFAF9] text-[#111827] flex-col font-sans relative w-full pb-24">
-        
+
         {/* Mobile Header */}
         <header className="sticky top-0 z-30 bg-white border-b border-[#E5E7EB] px-4 py-3 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-2">
             <LogoIcon size={28} />
             <span className="font-extrabold text-sm tracking-tight text-[#111827]">SariPay</span>
           </div>
-          
+
           {/* Workspace Switcher Button */}
           <button
             onClick={() => setIsSwitcherOpen(true)}
@@ -1917,7 +1905,7 @@ export default function UnifiedDashboard() {
             {/* Horizontal Metric Cards (Swipable) */}
             <div className="relative">
               <div className="flex gap-4 overflow-x-auto px-4 py-2 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                
+
                 {/* Metric 1: Available Balance */}
                 <div className="min-w-[85vw] snap-center bg-white border border-[#E5E7EB] p-5 rounded-2xl shadow-sm flex flex-col justify-between h-[130px]">
                   <div>
@@ -1988,24 +1976,29 @@ export default function UnifiedDashboard() {
 
             {/* Role-Based Primary Action Banner */}
             <div className="px-4">
-              {activeWorkspace?.type === 'merchant' ? (
+              {activeWorkspace?.type === 'distributor' ? (
                 <button
                   onClick={() => {
                     if (activeWorkspace?.verificationStatus !== 'Verified') {
-                      triggerAlert("Verification Required: Your business workspace must be Verified by SariPay compliance before generating handoff QR codes.", "Verification Required", "error");
+                      triggerAlert("Verification Required: Your business workspace must be Verified before generating handoff QR codes.", "Verification Required", "error");
                       return;
                     }
-                    setIsQuickQrPickerOpen(true);
+                    const inTransit = orders.find(o => o.status === 'In Transit');
+                    if (inTransit) {
+                      openQrModal(inTransit);
+                    } else {
+                      triggerAlert("No 'In Transit' orders available. Ship an order first.", "Notice", "info");
+                    }
                   }}
                   className="w-full flex items-center justify-between p-4.5 bg-[#059669] hover:bg-[#047857] text-white rounded-2xl shadow-md active:scale-[0.98] transition-all text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center animate-pulse">
                       <QrCode className="w-5.5 h-5.5 text-white" />
                     </div>
                     <div>
-                      <span className="text-xs font-bold block">Generate QR Code</span>
-                      <span className="text-[9px] text-white/80 block mt-0.5">Handoff code releases funds to supplier</span>
+                      <span className="text-xs font-bold block">Show Handoff QR</span>
+                      <span className="text-[9px] text-white/80 block mt-0.5">Present QR to merchant to release funds</span>
                     </div>
                   </div>
                   <ArrowUpRight className="w-5 h-5 text-white/90" />
@@ -2017,22 +2010,22 @@ export default function UnifiedDashboard() {
                       triggerAlert("Verification Required: Workspace must be Verified to scan handoff QR codes.", "Verification Required", "error");
                       return;
                     }
-                    const inTransit = orders.find(o => o.status === 'In Transit');
+                    const inTransit = orders.find(o => o.status === 'In Transit' || o.status === 'Funded');
                     if (inTransit) {
                       openScanner(inTransit);
                     } else {
-                      triggerAlert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.", "Notice", "info");
+                      triggerAlert("No 'In Transit' or 'Funded' orders available to scan. Fund an order escrow first.", "Notice", "info");
                     }
                   }}
                   className="w-full flex items-center justify-between p-4.5 bg-[#059669] hover:bg-[#047857] text-white rounded-2xl shadow-md active:scale-[0.98] transition-all text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center animate-pulse">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
                       <ScanLine className="w-5.5 h-5.5 text-white" />
                     </div>
                     <div>
                       <span className="text-xs font-bold block">Open Delivery Scanner</span>
-                      <span className="text-[9px] text-white/80 block mt-0.5">Verify handoff to receive payout</span>
+                      <span className="text-[9px] text-white/80 block mt-0.5">Scan distributor QR to release payout</span>
                     </div>
                   </div>
                   <ArrowUpRight className="w-5 h-5 text-white/90" />
@@ -2130,7 +2123,7 @@ export default function UnifiedDashboard() {
             {/* Recent Activity Section */}
             <div className="px-4">
               <h3 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Recent Escrows</h3>
-              
+
               {orders.length === 0 ? (
                 renderEmptyState('orders', 'Initialize First Order', () => {
                   if (activeWorkspace?.type === 'merchant') {
@@ -2142,8 +2135,8 @@ export default function UnifiedDashboard() {
               ) : (
                 <div className="flex flex-col gap-3">
                   {orders.slice(0, 3).map((order) => (
-                    <div 
-                      key={order.id} 
+                    <div
+                      key={order.id}
                       onClick={() => {
                         setSelectedOrder(order);
                         setIsMobileOrdersSheetOpen(true);
@@ -2154,7 +2147,7 @@ export default function UnifiedDashboard() {
                         <span className="font-mono font-extrabold text-xs text-[#059669]">#{order.id}</span>
                         {getStatusBadge(order.status)}
                       </div>
-                      
+
                       <div>
                         <h4 className="font-bold text-xs text-[#111827]">
                           {activeWorkspace?.type === 'merchant' ? order.supplier : order.merchantName || 'Retail Store'}
@@ -2194,11 +2187,10 @@ export default function UnifiedDashboard() {
                   <button
                     key={tab}
                     onClick={() => setMerchantTab(tab)}
-                    className={`px-4 py-2 rounded-full text-xs font-bold shrink-0 cursor-pointer transition-all border ${
-                      merchantTab === tab 
-                        ? 'bg-[#059669] text-white border-[#059669] shadow-sm' 
+                    className={`px-4 py-2 rounded-full text-xs font-bold shrink-0 cursor-pointer transition-all border ${merchantTab === tab
+                        ? 'bg-[#059669] text-white border-[#059669] shadow-sm'
                         : 'bg-white text-[#6B7280] border-[#E5E7EB] active:bg-[#FAFAF9]'
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>
@@ -2208,11 +2200,10 @@ export default function UnifiedDashboard() {
                   <button
                     key={tab}
                     onClick={() => setDistributorTab(tab)}
-                    className={`px-4 py-2 rounded-full text-xs font-bold shrink-0 cursor-pointer transition-all border ${
-                      distributorTab === tab 
-                        ? 'bg-[#059669] text-white border-[#059669] shadow-sm' 
+                    className={`px-4 py-2 rounded-full text-xs font-bold shrink-0 cursor-pointer transition-all border ${distributorTab === tab
+                        ? 'bg-[#059669] text-white border-[#059669] shadow-sm'
                         : 'bg-white text-[#6B7280] border-[#E5E7EB] active:bg-[#FAFAF9]'
-                    }`}
+                      }`}
                   >
                     {tab}
                   </button>
@@ -2226,7 +2217,7 @@ export default function UnifiedDashboard() {
                 renderEmptyState('orders')
               ) : (
                 (activeWorkspace?.type === 'merchant' ? merchantOrders : distributorOrders).map(order => (
-                  <div 
+                  <div
                     key={order.id}
                     onClick={() => {
                       setSelectedOrder(order);
@@ -2241,7 +2232,7 @@ export default function UnifiedDashboard() {
                       </div>
                       {getStatusBadge(order.status)}
                     </div>
-                    
+
                     <div>
                       <h4 className="font-bold text-xs text-[#111827]">
                         {activeWorkspace?.type === 'merchant' ? order.supplier : order.merchantName || 'Retail Store'}
@@ -2260,7 +2251,7 @@ export default function UnifiedDashboard() {
                         </span>
                         <span className="text-[9px] font-mono text-[#6B7280] font-semibold mt-0.5 block">{order.amount} XLM</span>
                       </div>
-                      
+
                       <div>
                         {activeWorkspace?.type === 'merchant' ? (
                           <>
@@ -2271,27 +2262,25 @@ export default function UnifiedDashboard() {
                                 onClick={() => handleLockEscrow(order.id, order.amount)}
                                 isLoading={fundingId === order.id}
                                 disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${
-                                  activeWorkspace.verificationStatus === 'Verified'
+                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
                                     ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
                                     : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
-                                }`}
+                                  }`}
                               >
                                 Fund Escrow
                               </Button>
                             ) : order.status === 'Funded' || order.status === 'In Transit' ? (
                               <Button
-                                variant="secondary"
+                                variant="primary"
                                 size="sm"
-                                onClick={() => openQrModal(order)}
+                                onClick={() => openScanner(order)}
                                 disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${
-                                  activeWorkspace.verificationStatus === 'Verified'
-                                    ? 'border-[#059669] text-[#059669] hover:bg-emerald-50/20'
+                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                                    ? 'bg-[#059669] text-white hover:bg-[#10B981]'
                                     : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                }`}
+                                  }`}
                               >
-                                Handoff QR
+                                Scan Delivery QR
                               </Button>
                             ) : (
                               <span className="text-[10px] text-[#059669] font-bold flex items-center gap-1">
@@ -2310,27 +2299,25 @@ export default function UnifiedDashboard() {
                                 onClick={() => handleShipOrder(order.id)}
                                 isLoading={isShippingId === order.id}
                                 disabled={activeWorkspace?.verificationStatus !== 'Verified'}
-                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${
-                                  activeWorkspace?.verificationStatus === 'Verified'
+                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${activeWorkspace?.verificationStatus === 'Verified'
                                     ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
                                     : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
-                                }`}
+                                  }`}
                               >
                                 Ship Order
                               </Button>
                             ) : order.status === 'In Transit' ? (
                               <Button
-                                variant="primary"
+                                variant="secondary"
                                 size="sm"
-                                onClick={() => openScanner(order)}
+                                onClick={() => openQrModal(order)}
                                 disabled={activeWorkspace?.verificationStatus !== 'Verified'}
-                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${
-                                  activeWorkspace?.verificationStatus === 'Verified'
-                                    ? 'bg-[#059669] hover:bg-[#10B981] text-white shadow-sm'
+                                className={`text-[10px] font-bold py-1.5 px-3 rounded-xl cursor-pointer ${activeWorkspace?.verificationStatus === 'Verified'
+                                    ? 'border-[#059669] text-[#059669] hover:bg-emerald-50/20'
                                     : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed shadow-none'
-                                }`}
+                                  }`}
                               >
-                                Scan QR
+                                Handoff QR
                               </Button>
                             ) : (
                               <span className="text-[10px] text-[#059669] font-bold flex items-center gap-1">
@@ -2401,7 +2388,7 @@ export default function UnifiedDashboard() {
             {/* Transactions History */}
             <div className="px-4">
               <h3 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">On-Chain Activity Logs</h3>
-              
+
               {walletTransactions.length === 0 ? (
                 renderEmptyState('escrows')
               ) : (
@@ -2451,11 +2438,10 @@ export default function UnifiedDashboard() {
                 <button
                   key={filter}
                   onClick={() => setNotifFilter(filter)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold shrink-0 transition-all border cursor-pointer ${
-                    notifFilter === filter
+                  className={`px-4 py-2 rounded-full text-xs font-bold shrink-0 transition-all border cursor-pointer ${notifFilter === filter
                       ? 'bg-[#059669] text-white border-[#059669]'
                       : 'bg-white text-[#6B7280] border-[#E5E7EB] active:bg-[#FAFAF9]'
-                  }`}
+                    }`}
                 >
                   {filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
@@ -2484,18 +2470,16 @@ export default function UnifiedDashboard() {
                     const isWarning = notif.type === 'warning';
                     const isSuccess = notif.type === 'success';
                     return (
-                      <div 
+                      <div
                         key={notif.id}
-                        className={`border rounded-2xl p-4 flex gap-3 bg-white text-left transition-all ${
-                          isWarning ? 'border-amber-200' : isSuccess ? 'border-emerald-100' : 'border-[#E5E7EB]'
-                        }`}
+                        className={`border rounded-2xl p-4 flex gap-3 bg-white text-left transition-all ${isWarning ? 'border-amber-200' : isSuccess ? 'border-emerald-100' : 'border-[#E5E7EB]'
+                          }`}
                       >
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
-                          isWarning ? 'bg-amber-50 text-amber-600' : isSuccess ? 'bg-emerald-50 text-[#059669]' : 'bg-[#FAFAF9] text-[#6B7280]'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${isWarning ? 'bg-amber-50 text-amber-600' : isSuccess ? 'bg-emerald-50 text-[#059669]' : 'bg-[#FAFAF9] text-[#6B7280]'
+                          }`}>
                           {isWarning ? <AlertCircle className="w-4.5 h-4.5" /> : isSuccess ? <CheckCircle className="w-4.5 h-4.5" /> : <Bell className="w-4.5 h-4.5" />}
                         </div>
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex justify-between items-start">
                             <span className="text-xs font-bold text-[#111827] block truncate pr-2">{notif.title}</span>
@@ -2562,7 +2546,7 @@ export default function UnifiedDashboard() {
             {/* Biometric Security Toggles */}
             <div className="px-4 space-y-3">
               <h4 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider text-left">Security Preferences</h4>
-              
+
               <div className="flex flex-col gap-2.5">
                 <label className="flex items-center justify-between bg-white border border-[#E5E7EB] p-4 rounded-2xl cursor-pointer active:bg-[#FAFAF9]">
                   <div className="flex items-center gap-3 text-left">
@@ -2572,8 +2556,8 @@ export default function UnifiedDashboard() {
                       <p className="text-[9px] text-[#6B7280] leading-tight font-normal mt-0.5">Release escrow contracts with face scanners</p>
                     </div>
                   </div>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={bioFaceId}
                     onChange={() => setBioFaceId(!bioFaceId)}
                     className="accent-[#059669] w-4.5 h-4.5 cursor-pointer shrink-0"
@@ -2588,8 +2572,8 @@ export default function UnifiedDashboard() {
                       <p className="text-[9px] text-[#6B7280] leading-tight font-normal mt-0.5">Dispatch shipment batches with fingerprint clicks</p>
                     </div>
                   </div>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={bioFingerprint}
                     onChange={() => setBioFingerprint(!bioFingerprint)}
                     className="accent-[#059669] w-4.5 h-4.5 cursor-pointer shrink-0"
@@ -2601,7 +2585,7 @@ export default function UnifiedDashboard() {
             {/* Settings links */}
             <div className="px-4 flex flex-col gap-3">
               <h4 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider text-left">Account Settings</h4>
-              
+
               <div className="flex flex-col gap-1 border border-[#E5E7EB] rounded-2xl bg-white overflow-hidden text-xs">
                 <button
                   onClick={() => {
@@ -2652,7 +2636,7 @@ export default function UnifiedDashboard() {
 
         {/* Floating Action Button (FAB) for Mobile View */}
         <div className="fixed bottom-20 right-4 z-40">
-          {activeWorkspace?.type === 'merchant' ? (
+          {activeWorkspace?.type === 'distributor' ? (
             <button
               onClick={() => {
                 if (activeWorkspace?.verificationStatus !== 'Verified') {
@@ -2673,11 +2657,11 @@ export default function UnifiedDashboard() {
                   triggerAlert("Verification Required: Workspace must be Verified to scan handoff QR codes.", "Verification Required", "error");
                   return;
                 }
-                const inTransit = orders.find(o => o.status === 'In Transit');
+                const inTransit = orders.find(o => o.status === 'In Transit' || o.status === 'Funded');
                 if (inTransit) {
                   openScanner(inTransit);
                 } else {
-                  triggerAlert("No 'In Transit' orders available to scan. Set an order status to 'Ship Order' first.", "Notice", "info");
+                  triggerAlert("No 'In Transit' or 'Funded' orders available to scan. Fund an order escrow first.", "Notice", "info");
                 }
               }}
               className="w-14 h-14 bg-gradient-to-r from-[#059669] to-[#10B981] text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all outline-none cursor-pointer"
@@ -2727,7 +2711,7 @@ export default function UnifiedDashboard() {
               <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto my-3 shrink-0" />
               <div className="px-6 pb-2.5 flex items-center justify-between border-b border-[#E5E7EB]">
                 <h3 className="text-base font-extrabold text-[#111827]">Switch Workspace</h3>
-                <button 
+                <button
                   onClick={() => setIsSwitcherOpen(false)}
                   className="p-1.5 rounded-full bg-[#FAFAF9] border border-[#E5E7EB] text-[#6B7280] cursor-pointer"
                 >
@@ -2743,15 +2727,13 @@ export default function UnifiedDashboard() {
                       handleWorkspaceSwitch(ws.id);
                       setIsSwitcherOpen(false);
                     }}
-                    className={`flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all cursor-pointer ${
-                      ws.id === activeWorkspaceId
+                    className={`flex items-center gap-3.5 p-4 rounded-2xl border text-left transition-all cursor-pointer ${ws.id === activeWorkspaceId
                         ? 'bg-emerald-50/50 border-[#059669] text-[#059669]'
                         : 'bg-white border-[#E5E7EB] text-[#111827] active:bg-stone-50'
-                    }`}
+                      }`}
                   >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      ws.id === activeWorkspaceId ? 'bg-[#059669]/10 text-[#059669]' : 'bg-[#FAFAF9] text-[#6B7280]'
-                    }`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${ws.id === activeWorkspaceId ? 'bg-[#059669]/10 text-[#059669]' : 'bg-[#FAFAF9] text-[#6B7280]'
+                      }`}>
                       {ws.type === 'merchant' ? <Store className="w-5 h-5" /> : <Truck className="w-5 h-5" />}
                     </div>
                     <div className="flex-1 min-w-0 text-left">
@@ -2791,7 +2773,7 @@ export default function UnifiedDashboard() {
           <div className="fixed inset-0 z-50 bg-[#111827] flex flex-col md:hidden animate-in fade-in duration-300">
             <div className="p-4 flex items-center justify-between border-b border-white/10 shrink-0">
               <span className="text-sm font-bold text-white/90">Verification Handoff QR Code</span>
-              <button 
+              <button
                 onClick={() => {
                   setIsQrModalOpen(false);
                   setSelectedOrder(null);
@@ -2801,7 +2783,7 @@ export default function UnifiedDashboard() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 text-center gap-6 overflow-y-auto">
               <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-400" />
@@ -2847,7 +2829,7 @@ export default function UnifiedDashboard() {
           <div className="fixed inset-0 z-50 bg-[#111827] flex flex-col md:hidden animate-in fade-in duration-300">
             <div className="p-4 flex items-center justify-between border-b border-white/10 shrink-0">
               <span className="text-sm font-bold text-white/90">Scan Merchant Handoff</span>
-              <button 
+              <button
                 onClick={() => setIsScannerOpen(false)}
                 className="p-2 bg-white/10 hover:bg-white/20 active:scale-95 text-white rounded-full transition-all cursor-pointer"
               >
@@ -2863,10 +2845,10 @@ export default function UnifiedDashboard() {
 
               <div className="w-full max-w-[270px] aspect-square relative my-4">
                 <div className="absolute inset-0 border-2 border-white/10 rounded-3xl" />
-                
+
                 {/* Fullscreen Scanner component instantiation */}
                 <div className="w-full h-full rounded-2xl overflow-hidden shadow-inner">
-                  <QRScanner 
+                  <QRScanner
                     onScanSuccess={handleScanSuccess}
                     expectedValue={selectedOrder.id}
                   />
@@ -2893,14 +2875,16 @@ export default function UnifiedDashboard() {
           </div>
         )}
 
-        {/* Merchant: Quick QR Picker Sheet Overlay */}
+        {/* Quick QR Picker Sheet Overlay */}
         {isQuickQrPickerOpen && (
           <div className="fixed inset-0 z-50 flex items-end justify-center md:hidden animate-in fade-in duration-200">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setIsQuickQrPickerOpen(false)} />
             <div className="relative bg-white w-full rounded-t-3xl shadow-2xl max-h-[80vh] overflow-y-auto pb-8 z-10 flex flex-col animate-in slide-in-from-bottom duration-300">
               <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto my-3 shrink-0" />
               <div className="px-6 pb-2.5 flex items-center justify-between border-b border-[#E5E7EB]">
-                <h3 className="text-base font-extrabold text-[#111827]">Generate Handoff QR</h3>
+                <h3 className="text-base font-extrabold text-[#111827]">
+                  {activeWorkspace?.type === 'distributor' ? "Generate Handoff QR" : "Generate Verification QR"}
+                </h3>
                 <button onClick={() => setIsQuickQrPickerOpen(false)} className="p-1.5 rounded-full bg-[#FAFAF9] border border-[#E5E7EB] text-[#6B7280] cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
@@ -2908,11 +2892,21 @@ export default function UnifiedDashboard() {
 
               <div className="p-6 flex flex-col gap-3">
                 <p className="text-xs text-[#6B7280] mb-2 leading-relaxed text-left">
-                  Select a funded or in-transit order escrow to generate the physical delivery verification code.
+                  {activeWorkspace?.type === 'distributor'
+                    ? "Select an in-transit order to show the cargo handoff QR code. The merchant will scan this to authorize payment."
+                    : "Select a funded order escrow to generate the verification code."}
                 </p>
 
-                {orders.filter(o => o.status === 'Funded' || o.status === 'In Transit').length > 0 ? (
-                  orders.filter(o => o.status === 'Funded' || o.status === 'In Transit').map(order => (
+                {orders.filter(o =>
+                  activeWorkspace?.type === 'distributor'
+                    ? o.status === 'In Transit'
+                    : (o.status === 'Funded' || o.status === 'In Transit')
+                ).length > 0 ? (
+                  orders.filter(o =>
+                    activeWorkspace?.type === 'distributor'
+                      ? o.status === 'In Transit'
+                      : (o.status === 'Funded' || o.status === 'In Transit')
+                  ).map(order => (
                     <button
                       key={order.id}
                       onClick={() => {
@@ -2953,20 +2947,20 @@ export default function UnifiedDashboard() {
               setIsMobileOrdersSheetOpen(false);
               setSelectedOrder(null);
             }} />
-            
+
             <div className="relative bg-white w-full rounded-t-3xl shadow-2xl max-h-[85vh] overflow-y-auto pb-8 z-10 flex flex-col animate-in slide-in-from-bottom duration-300">
               <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto my-3 shrink-0" />
-              
+
               <div className="px-6 pb-2.5 flex items-center justify-between border-b border-[#E5E7EB]">
                 <div className="text-left">
                   <span className="text-[10px] font-mono font-extrabold text-[#059669]">ORDER ESCROW DETAILS</span>
                   <h3 className="text-sm font-extrabold text-[#111827] mt-0.5">Order #{selectedOrder.id}</h3>
                 </div>
-                <button 
+                <button
                   onClick={() => {
                     setIsMobileOrdersSheetOpen(false);
                     setSelectedOrder(null);
-                  }} 
+                  }}
                   className="p-1.5 rounded-full bg-[#FAFAF9] border border-[#E5E7EB] text-[#6B7280] cursor-pointer"
                 >
                   <X className="w-4 h-4" />
@@ -3108,11 +3102,11 @@ export default function UnifiedDashboard() {
         )}
 
       </div>
- 
+
       {/* ======================================================== */}
       {/* C. ONBOARDING & SETTINGS MODALS */}
       {/* ======================================================== */}
-      
+
       {/* C.1 WORKSPACE ONBOARDING FLOW MODAL */}
       <Modal
         isOpen={isOnboardingOpen}
@@ -3120,7 +3114,7 @@ export default function UnifiedDashboard() {
         title="Create Workspace"
       >
         <div className="flex flex-col gap-6">
-          
+
           {/* STEP 1: WELCOME SCREEN */}
           {onboardingStep === 'welcome' && (
             <div className="flex flex-col items-center text-center p-4">
@@ -3151,7 +3145,7 @@ export default function UnifiedDashboard() {
 
               <div className="grid grid-cols-1 gap-4 mt-2">
                 {/* Selection A: Merchant Workspace */}
-                <div 
+                <div
                   onClick={() => {
                     setOnboardingType('merchant');
                     setNewWorkspaceName("");
@@ -3172,7 +3166,7 @@ export default function UnifiedDashboard() {
                 </div>
 
                 {/* Selection B: Distributor Workspace */}
-                <div 
+                <div
                   onClick={() => {
                     setOnboardingType('distributor');
                     setNewWorkspaceName("");
@@ -3243,18 +3237,17 @@ export default function UnifiedDashboard() {
         title="Settings & Organization Management"
       >
         <div className="grid grid-cols-12 gap-6">
-          
+
           {/* Side Tabs navigation */}
           <div className="col-span-12 md:col-span-3 flex md:flex-col gap-1 border-r border-[#E5E7EB]/80 pr-3 overflow-x-auto">
             {(['profile', 'security', 'passkeys', 'wallets', 'workspaces'] as const).map(tab => (
               <button
                 key={tab}
                 onClick={() => setSettingsTab(tab)}
-                className={`text-left px-3 py-2 text-xs font-semibold rounded-xl cursor-pointer transition-colors shrink-0 ${
-                  settingsTab === tab 
-                    ? 'bg-[#059669]/5 text-[#059669]' 
+                className={`text-left px-3 py-2 text-xs font-semibold rounded-xl cursor-pointer transition-colors shrink-0 ${settingsTab === tab
+                    ? 'bg-[#059669]/5 text-[#059669]'
                     : 'text-[#6B7280] hover:bg-[#FAFAF9] hover:text-[#111827]'
-                }`}
+                  }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -3263,7 +3256,7 @@ export default function UnifiedDashboard() {
 
           {/* Setting tabs body panel */}
           <div className="col-span-12 md:col-span-9 text-left min-h-[300px]">
-            
+
             {/* Tab: Profile */}
             {settingsTab === 'profile' && (
               <div className="flex flex-col gap-6">
@@ -3317,8 +3310,8 @@ export default function UnifiedDashboard() {
                       <p className="text-xs font-semibold text-[#111827]">Require Face ID Authorization</p>
                       <p className="text-[10px] text-[#6B7280] font-normal mt-0.5">Use Face ID to authorize high-value escrow releases.</p>
                     </div>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={bioFaceId}
                       onChange={() => setBioFaceId(!bioFaceId)}
                       className="accent-[#059669] w-4 h-4 cursor-pointer"
@@ -3330,8 +3323,8 @@ export default function UnifiedDashboard() {
                       <p className="text-xs font-semibold text-[#111827]">Require Fingerprint Signatures</p>
                       <p className="text-[10px] text-[#6B7280] font-normal mt-0.5">Confirm logistics dispatch updates using fingerprint scans.</p>
                     </div>
-                    <input 
-                      type="checkbox" 
+                    <input
+                      type="checkbox"
                       checked={bioFingerprint}
                       onChange={() => setBioFingerprint(!bioFingerprint)}
                       className="accent-[#059669] w-4 h-4 cursor-pointer"
@@ -3353,7 +3346,7 @@ export default function UnifiedDashboard() {
                     Add Passkey
                   </Button>
                 </div>
-                
+
                 <div className="flex flex-col gap-3">
                   {passkeys.map((key, i) => (
                     <div key={i} className="flex justify-between items-center border border-[#E5E7EB] p-4 rounded-xl bg-[#FAFAF9]/50">
@@ -3364,7 +3357,7 @@ export default function UnifiedDashboard() {
                           <p className="text-[9px] text-[#6B7280] font-mono mt-0.5">REGISTERED SECURE PATH</p>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => setPasskeys(passkeys.filter(pk => pk !== key))}
                         className="text-stone-400 hover:text-red-500 cursor-pointer"
                       >
@@ -3424,7 +3417,7 @@ export default function UnifiedDashboard() {
                           </span>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleDeleteWorkspace(ws.id)}
                         className="text-stone-400 hover:text-red-500 cursor-pointer"
                       >
@@ -3447,7 +3440,7 @@ export default function UnifiedDashboard() {
         title="Help Center & FAQs"
       >
         <div className="flex flex-col gap-5 text-left">
-          
+
           {/* Interactive Simulation Guide */}
           <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4.5 text-xs">
             <h5 className="font-bold text-[#059669] mb-1.5 flex items-center gap-1.5">
@@ -3514,14 +3507,16 @@ export default function UnifiedDashboard() {
           setIsQrModalOpen(false);
           setSelectedOrder(null);
         }}
-        title="Merchant Handoff Verification"
+        title={activeWorkspace?.type === 'merchant' ? "Merchant Handoff Verification" : "Supplier Cargo Handoff QR"}
       >
         {selectedOrder && (
           <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-xs text-[#6B7280] font-normal">
-              Present this handoff code to the delivery driver. When scanned, the smart contract will authorize releasing the locked escrow funds to the supplier.
+            <p className="text-xs text-[#6B7280] font-normal text-left">
+              {activeWorkspace?.type === 'merchant'
+                ? "Show this code to the supplier. (Note: It is recommended that you scan the supplier's cargo handoff code instead to authorize the release with your wallet)."
+                : "Show this Cargo Handoff QR code to the Merchant. They will scan it using their SariPay wallet to release the locked escrow payment to your account."}
             </p>
-            
+
             <div className="my-2 bg-[#FAFAF9] p-3 rounded-2xl border border-[#E5E7EB] shadow-inner">
               <QRGenerator value={selectedOrder.id} size={220} />
             </div>
@@ -3588,7 +3583,7 @@ export default function UnifiedDashboard() {
             disabled={isSubmittingInvoice}
             id="dist-invoice-amount"
           />
-          
+
           <div className="flex flex-col gap-1.5 w-full text-left">
             <label htmlFor="dist-invoice-details" className="text-xs font-semibold text-[#6B7280] font-sans">
               Product Handoff Details
@@ -3638,7 +3633,7 @@ export default function UnifiedDashboard() {
         title="Verification Scan - Claim Payout"
       >
         {selectedOrder && (
-          <QRScanner 
+          <QRScanner
             onScanSuccess={handleScanSuccess}
             expectedValue={selectedOrder.id}
           />
@@ -3654,7 +3649,7 @@ export default function UnifiedDashboard() {
         <div className="flex flex-col gap-4 text-left">
           {/* Progress Indicator */}
           <div className="w-full bg-stone-100 rounded-full h-1.5 mb-2 relative overflow-hidden">
-            <div 
+            <div
               className="bg-[#059669] h-1.5 rounded-full transition-all duration-300"
               style={{ width: `${(vStep / 4) * 100}%` }}
             />
@@ -3662,8 +3657,8 @@ export default function UnifiedDashboard() {
           <div className="flex justify-between items-center text-[10px] font-bold text-stone-500 uppercase tracking-wider mb-2">
             <span>Step {vStep} of 4: {
               vStep === 1 ? 'Business Profile' :
-              vStep === 2 ? 'Documents Upload' :
-              vStep === 3 ? 'Review details' : 'Final Submit'
+                vStep === 2 ? 'Documents Upload' :
+                  vStep === 3 ? 'Review details' : 'Final Submit'
             }</span>
             <span>{vStep * 25}% Complete</span>
           </div>
@@ -3676,7 +3671,7 @@ export default function UnifiedDashboard() {
               handleVerificationSubmit(e);
             }
           }} className="flex flex-col gap-4">
-            
+
             {/* STEP 1: BUSINESS PROFILE */}
             {vStep === 1 && (
               <div className="flex flex-col gap-3">

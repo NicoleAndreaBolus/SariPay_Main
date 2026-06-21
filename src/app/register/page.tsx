@@ -136,8 +136,10 @@ function RegisterForm() {
 
         // Check if using biometric passkey or connected Freighter wallet
         if (address.startsWith('GBPASSKEY')) {
+          localStorage.setItem('saripay_auth_type', 'passkey');
           localStorage.setItem('saripay_wallet_balance', '150.00');
         } else {
+          localStorage.setItem('saripay_auth_type', 'freighter');
           // It's a real connected wallet! Fetch the actual live balance from Stellar Horizon network
           try {
             const { getLiveBalance } = await import('@/services/stellar');

@@ -82,14 +82,22 @@ function RegisterForm() {
     setIsOnboardingProgress(true);
 
     try {
-      setOnboardingText('Initiating secure WebAuthn handshake...');
-      await new Promise(resolve => setTimeout(resolve, 800));
+      let address = walletAddress;
 
-      setOnboardingText('Verifying biometric device fingerprint...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // If no wallet is connected yet, perform biometric passkey registration
+      if (!address) {
+        setOnboardingText('Initiating secure WebAuthn handshake...');
+        await new Promise(resolve => setTimeout(resolve, 800));
 
-      setOnboardingText('Generating cryptographic escrow credentials...');
-      const address = await setupPasskey();
+        setOnboardingText('Verifying biometric device fingerprint...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        setOnboardingText('Generating cryptographic escrow credentials...');
+        address = await setupPasskey();
+      } else {
+        setOnboardingText('Registering workspace with your connected wallet...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
       
       if (address) {
         // Create User profile in localStorage and Users database
@@ -125,7 +133,24 @@ function RegisterForm() {
         localStorage.setItem('saripay_workspaces', JSON.stringify(initialWorkspaces));
         localStorage.setItem('saripay_active_workspace_id', initialWorkspace.id);
         localStorage.setItem('saripay_auth_role', workspaceType === 'distributor' ? 'supplier' : 'merchant');
-        localStorage.setItem('saripay_wallet_balance', '150.00');
+
+        // Check if using biometric passkey or connected Freighter wallet
+        if (address.startsWith('GBPASSKEY')) {
+          localStorage.setItem('saripay_wallet_balance', '150.00');
+        } else {
+          // It's a real connected wallet! Fetch the actual live balance from Stellar Horizon network
+          try {
+            const { getLiveBalance } = await import('@/services/stellar');
+            const liveBal = await getLiveBalance(address);
+            localStorage.setItem('saripay_wallet_balance', liveBal);
+          } catch {
+            // Keep existing balance or default to 0.00
+            const existingBal = localStorage.getItem('saripay_wallet_balance');
+            if (!existingBal) {
+              localStorage.setItem('saripay_wallet_balance', '0.00');
+            }
+          }
+        }
 
         // Sync with the shared server database immediately
         await syncWithServer();

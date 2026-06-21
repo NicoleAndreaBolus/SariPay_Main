@@ -64,16 +64,49 @@ SariPay eliminates the need for physical cash or delayed bank transfers during B
 
 ## 💻 How to Run a Simulation Test (Step-by-Step)
 
-You can test the entire B2B transaction cycle directly in the browser dashboard:
+You can test the entire B2B transaction cycle either **on a single device** (using the workspace switcher at the top) or **across two separate devices** (e.g., a phone and a laptop) using Vercel Postgres live sync:
 
-1. **Verify Your Workspace**: Click the **Verify Workspace** banner at the top of the screen and complete the quick 4-step wizard. This activates your simulated account.
-2. **Initialize an Order**: Stay in the **Merchant Workspace** (top switcher) and click **Create Order** (or **Place Order**). Add a supplier name and amount, then submit.
-3. **Lock the Funds (Deposit)**: Tap the new order in your list and click **Fund Escrow Contract**. You will see your *Available Balance* go down and your *Funds in Escrow Trust* go up.
-4. **Ship the Cargo (Supplier)**: Switch to the **Distributor Workspace** using the switcher pill at the top of the screen. Find your order in the deliveries list and click **Dispatch Cargo (Ship Order)**.
-5. **Release Payout via QR**: 
-   * Switch to the **Distributor Workspace** using the switcher pill at the top, select the order, and click **Show Handoff QR** (or present QR).
-   * Switch back to the **Merchant Workspace**, click **Open Delivery Scanner** (bottom-right floating button or table action), and scan the Distributor's QR code (you can simulate scanning in the dialog).
-   * **Result**: The transaction completes successfully because it is signed by the Merchant wallet (satisfying the contract's on-chain authorization requirement), clearing the escrow and transferring the payout to the distributor's wallet balance!
+### Option A: Cross-Device Flow (Recommended - Real B2B Experience)
+
+1. **Setup Merchant (Device A - e.g., Phone/Retailer)**:
+   * Open SariPay, click **Connect Wallet** (connect your Merchant wallet, e.g., Freighter key `GCCY5TQ...`), or use the Mock/Passkey.
+   * Go to the workspace dropdown, select/create a **Merchant** workspace, and click the **Verify Workspace** banner to complete onboarding review (makes status 'Verified').
+   * Copy the Merchant's Stellar wallet address shown in the dashboard.
+
+2. **Setup Distributor (Device B - e.g., Laptop/Supplier)**:
+   * Open SariPay, connect your Distributor wallet (e.g., Freighter key `GD5ST...`), or select the Distributor Mock/Passkey.
+   * Create/Onboard a **Distributor** workspace (e.g., "Santos Distribution") and complete the compliance verification to make it 'Verified'.
+
+3. **Issue Invoice (Device B - Distributor)**:
+   * In the Distributor dashboard, click **Register Supply Invoice**.
+   * Paste the Merchant's wallet address from Device A, enter an amount (e.g., `100` XLM), and enter shipment details. Submit the invoice. This initializes the order on-chain and in the database.
+   * Take note of the generated **Order ID** (e.g., `#20845`).
+
+4. **Import & Fund Escrow (Device A - Merchant)**:
+   * In the Merchant dashboard, type the **Order ID** into the "Import Order" search input and click **Import**.
+   * Select the imported order and click **Fund Escrow Contract** (prompts wallet signature). The merchant's wallet balance is locked into the escrow.
+
+5. **Ship Order (Device B - Distributor)**:
+   * The distributor dashboard will automatically update to show the order status is now `Funded`.
+   * Click **Ship Order** (updates status to `In Transit`).
+
+6. **Delivery QR Handoff & Release (Handoff)**:
+   * **On Device B (Distributor)**: Tap the order and click **Show Handoff QR** to display the cargo verification QR code.
+   * **On Device A (Merchant)**: Click the **Scan Delivery QR** button (or bottom FAB scanner), and scan the QR code displayed on the Distributor's screen.
+   * **On Device A (Merchant)**: The scanner will prompt the Merchant to sign the delivery confirmation transaction. Once approved, the smart contract automatically releases the escrow payment directly to the distributor's wallet on-chain!
+
+---
+
+### Option B: Single-Device Simulation (Fast Testing)
+
+1. **Onboard & Select Workspace**: Switch to the **Merchant** workspace view at the top, verify your workspace, and copy your wallet address.
+2. **Onboard Distributor**: Switch to the **Distributor** workspace view, verify it, and click **Register Supply Invoice**. Paste your Merchant wallet address, enter an amount, and submit. Copy the new Order ID.
+3. **Import & Deposit**: Switch back to the **Merchant** viewport, enter the Order ID in the "Import" box, select it, and click **Fund Escrow Contract**.
+4. **Ship**: Switch to the **Distributor** viewport and click **Ship Order** on the order card.
+5. **Release**: 
+   * In the **Distributor** viewport, click **Show Handoff QR** to display the code.
+   * Switch to the **Merchant** viewport, click the floating **Scan Delivery QR** scanner button, and click **Simulate Success Scan** to verify delivery.
+   * **Result**: Payout is released on-chain and moves from the merchant's trust to the distributor's wallet balance!
 
 ---
 

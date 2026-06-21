@@ -16,8 +16,8 @@ function RegisterForm() {
   const searchParams = useSearchParams();
   const { walletAddress, isConnecting, debugStatus, setupPasskey } = useStellarWallet();
 
-  // Wizard state: 'welcome' | 'selection' | 'details' | 'keyless'
-  const [wizardStep, setWizardStep] = useState<'welcome' | 'selection' | 'details' | 'keyless'>('welcome');
+  // Wizard state: 'welcome' | 'profile' | 'selection' | 'details' | 'keyless'
+  const [wizardStep, setWizardStep] = useState<'welcome' | 'profile' | 'selection' | 'details' | 'keyless'>('welcome');
   const [workspaceType, setWorkspaceType] = useState<'merchant' | 'distributor' | null>(null);
   
   // Workspace inputs
@@ -164,12 +164,86 @@ function RegisterForm() {
             Let's create your first workspace. Start managing payments and delivery verification in minutes.
           </p>
           <Button
-            onClick={() => setWizardStep('selection')}
+            onClick={() => {
+              setFormError(null);
+              setWizardStep('profile');
+            }}
             className="w-full h-12 flex items-center justify-center gap-2 font-semibold bg-[#059669] hover:bg-[#10B981] text-white rounded-xl"
           >
             Get Started
             <ArrowRight className="w-4.5 h-4.5" />
           </Button>
+        </div>
+      )}
+
+      {/* STEP 1.5: MAIN PROFILE STEP */}
+      {wizardStep === 'profile' && (
+        <div className="flex flex-col gap-5">
+          <div>
+            <h2 className="text-xl font-bold text-[#111827] tracking-tight">
+              Create Your Profile
+            </h2>
+            <p className="text-xs text-[#6B7280] font-normal mt-1">
+              Enter your full name and email address. This will be your primary account profile.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <Input
+              label="Full Name"
+              placeholder="e.g. John Doe"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              id="onboarding-register-user-name"
+            />
+
+            <Input
+              label="Email Address"
+              placeholder="e.g. john@example.com"
+              type="email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              id="onboarding-register-user-email"
+            />
+
+            {formError && (
+              <p className="text-xs text-red-500 font-semibold flex items-center gap-1.5">
+                <ShieldAlert className="w-4 h-4 text-red-500" />
+                {formError}
+              </p>
+            )}
+
+            <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-5 mt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setFormError(null);
+                  setWizardStep('welcome');
+                }}
+                className="text-xs font-semibold text-[#6B7280] hover:text-[#111827]"
+              >
+                Back
+              </button>
+              <Button
+                onClick={() => {
+                  setFormError(null);
+                  if (!userName.trim()) {
+                    setFormError('Please enter your full name.');
+                    return;
+                  }
+                  if (!userEmail.trim() || !userEmail.includes('@')) {
+                    setFormError('Please enter a valid email address.');
+                    return;
+                  }
+                  setWizardStep('selection');
+                }}
+                className="bg-[#059669] hover:bg-[#10B981] text-white text-xs font-bold py-2.5 px-5 rounded-xl flex items-center gap-1.5"
+              >
+                Continue
+                <ArrowRight className="w-4.5 h-4.5" />
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -223,7 +297,10 @@ function RegisterForm() {
 
           <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-4 mt-2">
             <button
-              onClick={() => setWizardStep('welcome')}
+              onClick={() => {
+                setFormError(null);
+                setWizardStep('profile');
+              }}
               className="text-xs font-semibold text-[#6B7280] hover:text-[#111827]"
             >
               Back
@@ -255,23 +332,6 @@ function RegisterForm() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              <Input
-                label="Full Name"
-                placeholder="e.g. John Doe"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                id="onboarding-register-user-name"
-              />
-
-              <Input
-                label="Email Address"
-                placeholder="e.g. john@example.com"
-                type="email"
-                value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
-                id="onboarding-register-user-email"
-              />
-
               <Input
                 label="Workspace Business Name"
                 placeholder={workspaceType === 'merchant' ? "e.g. John's Mini Mart" : "e.g. Santos Distribution"}
@@ -308,7 +368,10 @@ function RegisterForm() {
               <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-5 mt-4">
                 <button
                   type="button"
-                  onClick={() => setWizardStep('selection')}
+                  onClick={() => {
+                    setFormError(null);
+                    setWizardStep('selection');
+                  }}
                   className="text-xs font-semibold text-[#6B7280] hover:text-[#111827]"
                 >
                   Back

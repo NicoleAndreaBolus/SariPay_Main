@@ -100,7 +100,6 @@ To build and deploy the smart contracts locally:
 
 ### 1. Install Dependencies
 ```bash
-cd saripay-frontend
 npm install
 ```
 

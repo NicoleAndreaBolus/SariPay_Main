@@ -828,6 +828,18 @@ export default function UnifiedDashboard() {
         localStorage.setItem('saripay_active_workspace_id', updated[0].id);
       }
       localStorage.setItem('saripay_workspaces', JSON.stringify(updated));
+
+      // Track the deletion for sync
+      try {
+        const deletedIds = JSON.parse(localStorage.getItem('saripay_deleted_workspace_ids') || '[]');
+        if (!deletedIds.includes(id)) {
+          deletedIds.push(id);
+          localStorage.setItem('saripay_deleted_workspace_ids', JSON.stringify(deletedIds));
+        }
+      } catch (e) {
+        localStorage.setItem('saripay_deleted_workspace_ids', JSON.stringify([id]));
+      }
+
       syncWithServer().catch(err => console.error("Failed to sync workspace deletion:", err));
     }
   };

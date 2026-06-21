@@ -766,6 +766,17 @@ export default function AdminPortal() {
     setWorkspaces(updated);
     localStorage.setItem('saripay_workspaces', JSON.stringify(updated));
 
+    // Track the deletion for sync
+    try {
+      const deletedIds = JSON.parse(localStorage.getItem('saripay_deleted_workspace_ids') || '[]');
+      if (!deletedIds.includes(wsId)) {
+        deletedIds.push(wsId);
+        localStorage.setItem('saripay_deleted_workspace_ids', JSON.stringify(deletedIds));
+      }
+    } catch (e) {
+      localStorage.setItem('saripay_deleted_workspace_ids', JSON.stringify([wsId]));
+    }
+
     addAdminLog(
       "Workspace Deleted",
       `Permanently deleted workspace "${target.name}" from the system.`,

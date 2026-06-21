@@ -19,6 +19,7 @@ export async function syncWithServer(isReset = false, customData?: any) {
         adminLogs: customData.adminLogs || [],
         clientWalletAddress: typeof window !== 'undefined' ? localStorage.getItem('saripay_wallet_address') : null,
         isAdmin: typeof window !== 'undefined' ? !!localStorage.getItem('saripay_admin_session') : false,
+        deletedWorkspaceIds: [],
       };
     } else {
       payload = {
@@ -30,6 +31,7 @@ export async function syncWithServer(isReset = false, customData?: any) {
         adminLogs: JSON.parse(localStorage.getItem('saripay_admin_logs') || '[]'),
         clientWalletAddress: typeof window !== 'undefined' ? localStorage.getItem('saripay_wallet_address') : null,
         isAdmin: typeof window !== 'undefined' ? !!localStorage.getItem('saripay_admin_session') : false,
+        deletedWorkspaceIds: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('saripay_deleted_workspace_ids') || '[]') : [],
       };
     }
 
@@ -50,6 +52,11 @@ export async function syncWithServer(isReset = false, customData?: any) {
     }
 
     const data = await res.json();
+
+    // Clear deleted workspace tracker on success
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('saripay_deleted_workspace_ids', '[]');
+    }
 
     // Update LocalStorage keys with the merged databases returned from server
     if (data.workspaces) localStorage.setItem('saripay_workspaces', JSON.stringify(data.workspaces));

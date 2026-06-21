@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { sql } from '@vercel/postgres';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,8 +17,52 @@ let localMemoryDb: any = {
   adminLogs: [],
 };
 
+// Check if Postgres is configured
+const isPostgresConfigured = typeof process.env.POSTGRES_URL !== 'undefined';
+
 // Read from the shared cloud database
 async function readDb() {
+  if (isPostgresConfigured) {
+    try {
+      // Query database state row
+      const { rows } = await sql`SELECT val FROM saripay_state WHERE key = 'database' LIMIT 1`;
+      if (rows && rows.length > 0) {
+        localMemoryDb = rows[0].val;
+        return rows[0].val;
+      }
+    } catch (e: any) {
+      // If table doesn't exist, create it!
+      if (e.message && (e.message.includes('relation "saripay_state" does not exist') || e.code === '42P01')) {
+        try {
+          await sql`CREATE TABLE IF NOT EXISTS saripay_state (key VARCHAR(255) PRIMARY KEY, val JSONB)`;
+          console.log('[Sync Database] Created saripay_state table in Postgres.');
+        } catch (createErr) {
+          console.error('[Sync Database] Failed to create postgres table:', createErr);
+        }
+      } else {
+        console.error('[Sync Database] Postgres read query failed:', e);
+      }
+    }
+
+    // Default baseline if query returned nothing or table was just created
+    const fallback = {
+      workspaces: [],
+      orders: [],
+      users: [],
+      disputes: [],
+      tickets: [],
+      adminLogs: [],
+    };
+    try {
+      await sql`INSERT INTO saripay_state (key, val) VALUES ('database', ${JSON.stringify(fallback)}) ON CONFLICT (key) DO NOTHING`;
+    } catch (insertErr) {
+      console.error('[Sync Database] Failed to insert fallback state in Postgres:', insertErr);
+    }
+    localMemoryDb = fallback;
+    return fallback;
+  }
+
+  // Fallback to free JSON bin if Postgres is not configured (e.g. local dev)
   const res = await fetch(API_URL, {
     method: 'GET',
     headers: {
@@ -36,6 +81,17 @@ async function readDb() {
 // Write to the shared cloud database
 async function writeDb(data: any) {
   localMemoryDb = data; // Update in-memory cache
+
+  if (isPostgresConfigured) {
+    try {
+      await sql`INSERT INTO saripay_state (key, val) VALUES ('database', ${JSON.stringify(data)}) ON CONFLICT (key) DO UPDATE SET val = EXCLUDED.val`;
+      return;
+    } catch (e) {
+      console.error('[Sync Database] Postgres write failed:', e);
+    }
+  }
+
+  // Fallback to free JSON bin
   const res = await fetch(API_URL, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -141,74 +197,95 @@ function mergeWorkspaceItem(existing: any, item: any) {
 }
 
 // Special workspaces merge helper supporting client-side deletions
-function mergeWorkspaces(serverWorkspaces: any[], clientWorkspaces: any[], clientWalletAddress: string | null, isAdmin: boolean) {
+function mergeWorkspaces(
+  serverWorkspaces: any[],
+  clientWorkspaces: any[],
+  clientWalletAddress: string | null,
+  isAdmin: boolean,
+  deletedWorkspaceIds: string[] = []
+) {
+  const deletedSet = new Set(deletedWorkspaceIds || []);
+  
+  // Filter out any server workspaces that are explicitly deleted
+  const filteredServerWorkspaces = (serverWorkspaces || []).filter(
+    (w) => w && w.id && !deletedSet.has(w.id)
+  );
+
   const serverMap = new Map();
-  for (const item of serverWorkspaces || []) {
+  for (const item of filteredServerWorkspaces) {
     if (item && item.id) {
       serverMap.set(item.id, item);
     }
   }
 
   const clientMap = new Map();
-  for (const item of clientWorkspaces || []) {
+  // Filter out any client workspaces that are explicitly deleted
+  const filteredClientWorkspaces = (clientWorkspaces || []).filter(
+    (w) => w && w.id && !deletedSet.has(w.id)
+  );
+  
+  for (const item of filteredClientWorkspaces) {
     if (item && item.id) {
       clientMap.set(item.id, item);
     }
   }
 
-  // If client is Admin, the client's list is the absolute source of truth!
+  const finalWorkspaces: any[] = [];
+
   if (isAdmin) {
-    const result = [];
-    for (const item of clientWorkspaces || []) {
-      if (!item || !item.id) continue;
-      const existing = serverMap.get(item.id);
-      if (existing) {
-        result.push(mergeWorkspaceItem(existing, item));
-      } else {
-        result.push(item);
-      }
-    }
-    return result;
-  }
-
-  // If regular client, merge but respect deletions of their own workspaces.
-  const finalWorkspaces = [];
-
-  // 1. Process server workspaces
-  for (const serverItem of serverWorkspaces || []) {
-    if (!serverItem || !serverItem.id) continue;
-
-    const clientItem = clientMap.get(serverItem.id);
-    const belongsToClient = clientWalletAddress && serverItem.walletAddress === clientWalletAddress;
-
-    if (belongsToClient) {
+    // Admin has access to all workspaces, but doesn't necessarily have all user workspaces loaded locally on first sync.
+    // So we merge server workspaces with client workspaces:
+    // 1. Process server workspaces
+    for (const serverItem of serverMap.values()) {
+      const clientItem = clientMap.get(serverItem.id);
       if (clientItem) {
-        // Client still has it, merge it
+        // Admin has it locally (e.g. updated verification status), merge it
         finalWorkspaces.push(mergeWorkspaceItem(serverItem, clientItem));
       } else {
-        // Client deleted it, skip it (deletes it from server)
-        console.log(`[Sync API] Deleting workspace: ${serverItem.id} belonging to client ${clientWalletAddress}`);
-      }
-    } else {
-      // Belongs to someone else, keep it
-      if (clientItem) {
-        finalWorkspaces.push(mergeWorkspaceItem(serverItem, clientItem));
-      } else {
+        // Keep it (since admin hasn't deleted it, just might not have it in local storage yet)
         finalWorkspaces.push(serverItem);
       }
     }
-  }
-
-  // 2. Add any new workspaces client created
-  for (const clientItem of clientWorkspaces || []) {
-    if (clientItem && clientItem.id && !serverMap.has(clientItem.id)) {
-      // Only treat as a new workspace if it is "Unverified"
-      // If it is already Pending, Verified, etc. and not on the server, it was deleted!
-      const status = clientItem.verificationStatus || 'Unverified';
-      if (status === 'Unverified') {
+    // 2. Add any workspaces that the client (admin) created or has that are not on the server
+    for (const clientItem of filteredClientWorkspaces) {
+      if (clientItem && clientItem.id && !serverMap.has(clientItem.id)) {
         finalWorkspaces.push(clientItem);
+      }
+    }
+  } else {
+    // If regular client, merge but respect deletions of their own workspaces.
+    // 1. Process server workspaces
+    for (const serverItem of serverMap.values()) {
+      const clientItem = clientMap.get(serverItem.id);
+      const belongsToClient = clientWalletAddress && serverItem.walletAddress === clientWalletAddress;
+
+      if (belongsToClient) {
+        if (clientItem) {
+          // Client still has it, merge it
+          finalWorkspaces.push(mergeWorkspaceItem(serverItem, clientItem));
+        } else {
+          // Client deleted it, skip it (deletes it from server)
+          console.log(`[Sync API] Deleting workspace: ${serverItem.id} belonging to client ${clientWalletAddress}`);
+        }
       } else {
-        console.log(`[Sync API] Ignoring deleted workspace ${clientItem.id} sent by client.`);
+        // Belongs to someone else, keep it
+        if (clientItem) {
+          finalWorkspaces.push(mergeWorkspaceItem(serverItem, clientItem));
+        } else {
+          finalWorkspaces.push(serverItem);
+        }
+      }
+    }
+
+    // 2. Add any new workspaces client created
+    for (const clientItem of filteredClientWorkspaces) {
+      if (clientItem && clientItem.id && !serverMap.has(clientItem.id)) {
+        const status = clientItem.verificationStatus || 'Unverified';
+        if (status === 'Unverified') {
+          finalWorkspaces.push(clientItem);
+        } else {
+          console.log(`[Sync API] Ignoring deleted workspace ${clientItem.id} sent by client.`);
+        }
       }
     }
   }
@@ -249,10 +326,11 @@ export async function POST(request: Request) {
     
     const clientWalletAddress = body.clientWalletAddress || null;
     const isAdmin = body.isAdmin || false;
+    const deletedWorkspaceIds = body.deletedWorkspaceIds || [];
 
     // Merge each list
     const mergedDb = {
-      workspaces: mergeWorkspaces(currentDb.workspaces, body.workspaces, clientWalletAddress, isAdmin),
+      workspaces: mergeWorkspaces(currentDb.workspaces, body.workspaces, clientWalletAddress, isAdmin, deletedWorkspaceIds),
       orders: mergeArrays(currentDb.orders, body.orders),
       users: mergeArrays(currentDb.users, body.users),
       disputes: mergeArrays(currentDb.disputes, body.disputes),

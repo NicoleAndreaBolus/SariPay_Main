@@ -19,6 +19,12 @@ export interface Order {
 
 const DEFAULT_ORDERS: Order[] = [];
 
+function getSanitizedContractId() {
+  const rawId = process.env.NEXT_PUBLIC_CONTRACT_ID;
+  if (!rawId) return undefined;
+  return rawId.trim().replace(/^['"]|['"]$/g, '');
+}
+
 export function useSariPayContract() {
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -71,7 +77,7 @@ export function useSariPayContract() {
     orderData: { id: string; supplier: string; amount: string; details: string; merchantAddress: string; merchantName?: string },
     walletAddress: string | null
   ): Promise<boolean> => {
-    const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+    const CONTRACT_ID = getSanitizedContractId();
 
     // Check if we should execute a real Soroban contract call
     if (CONTRACT_ID && walletAddress && !walletAddress.startsWith('GBPASSKEY')) {
@@ -141,7 +147,7 @@ export function useSariPayContract() {
     currentBalance: string, 
     walletAddress: string | null
   ): Promise<{ success: boolean, newBalance: string }> => {
-    const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+    const CONTRACT_ID = getSanitizedContractId();
     
     if (CONTRACT_ID && walletAddress && !walletAddress.startsWith('GBPASSKEY')) {
       console.log(`[Soroban] Funding order #${id} on-chain with contract ID: ${CONTRACT_ID}`);
@@ -251,7 +257,7 @@ export function useSariPayContract() {
     id: string, 
     walletAddress: string | null
   ): Promise<boolean> => {
-    const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+    const CONTRACT_ID = getSanitizedContractId();
     
     if (CONTRACT_ID && walletAddress && !walletAddress.startsWith('GBPASSKEY')) {
       console.log(`[Soroban] Releasing escrow for order #${id} on-chain`);
@@ -339,7 +345,7 @@ export function useSariPayContract() {
     id: string,
     walletAddress: string | null
   ): Promise<Order | null> => {
-    const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+    const CONTRACT_ID = getSanitizedContractId();
     if (CONTRACT_ID && walletAddress && !walletAddress.startsWith('GBPASSKEY')) {
       console.log(`[Soroban] Querying order #${id} on-chain with contract ID: ${CONTRACT_ID}`);
       try {
@@ -392,7 +398,7 @@ export function useSariPayContract() {
   const syncOrders = useCallback(async (
     walletAddress: string | null
   ): Promise<void> => {
-    const CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+    const CONTRACT_ID = getSanitizedContractId();
     if (!CONTRACT_ID || !walletAddress || walletAddress.startsWith('GBPASSKEY')) return;
 
     console.log("[Soroban] Syncing active orders with blockchain...");

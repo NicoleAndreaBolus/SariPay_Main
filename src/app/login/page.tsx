@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShieldAlert, Fingerprint, Sparkles, Wallet, HelpCircle } from 'lucide-react';
+import { ShieldAlert, Fingerprint, Sparkles, Wallet, HelpCircle, X } from 'lucide-react';
 import { useStellarWallet } from '@/hooks/useStellarWallet';
 import { Button } from '@/components/common/Button';
 import { LogoIcon, LogoLockup } from '@/components/common/Logo';
@@ -11,6 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { walletAddress, isConnecting, debugStatus, linkFreighter, setupPasskey } = useStellarWallet();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isWalletKitOpen, setIsWalletKitOpen] = useState(false);
 
   // If already logged in, redirect directly to unified dashboard (or register if new user)
   useEffect(() => {
@@ -79,13 +80,12 @@ export default function LoginPage() {
         {/* Interactive Actions */}
         <div className="flex flex-col gap-3">
           <Button
-            onClick={handleLinkFreighter}
-            isLoading={isConnecting && debugStatus.includes('Freighter')}
+            onClick={() => setIsWalletKitOpen(true)}
             disabled={isConnecting}
-            className="w-full h-12 flex items-center justify-center gap-2.5 text-sm font-semibold bg-[#059669] hover:bg-[#10B981] text-white"
+            className="w-full h-12 flex items-center justify-center gap-2.5 text-sm font-semibold bg-[#059669] hover:bg-[#10B981] text-white rounded-xl"
           >
             <Wallet className="w-5 h-5 text-white" />
-            Link Freighter Wallet
+            Connect Wallet
           </Button>
 
           <div className="relative flex py-2 items-center">
@@ -105,6 +105,113 @@ export default function LoginPage() {
             Setup Biometric Passkey
           </Button>
         </div>
+
+        {/* Connect Wallet Modal (Stellar Wallets Kit Simulation) */}
+        {isWalletKitOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <div 
+              className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity" 
+              onClick={() => setIsWalletKitOpen(false)} 
+            />
+            
+            {/* Modal Container */}
+            <div className="relative w-full max-w-[340px] bg-white border border-slate-200 rounded-3xl p-5 shadow-2xl z-10 text-slate-800 flex flex-col gap-4 font-sans animate-in fade-in zoom-in-95 duration-200">
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <a 
+                  href="https://stellarwalletskit.dev" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="text-slate-400 hover:text-slate-600 transition-colors"
+                  title="Help"
+                >
+                  <HelpCircle className="w-5 h-5" />
+                </a>
+                <h3 className="text-sm font-bold text-slate-800 tracking-tight">Connect Wallet</h3>
+                <button 
+                  type="button"
+                  onClick={() => setIsWalletKitOpen(false)}
+                  className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Wallet Options */}
+              <div className="flex flex-col gap-2">
+                {[
+                  { id: 'freighter', name: 'Freighter', letter: 'F', color: 'bg-[#4F46E5]' },
+                  { id: 'walletconnect', name: 'WalletConnect', letter: 'W', color: 'bg-[#0d9488]' },
+                  { id: 'xbull', name: 'xBull', letter: 'X', color: 'bg-[#7c3aed]' },
+                  { id: 'albedo', name: 'Albedo', letter: 'A', color: 'bg-[#ea580c]' },
+                  { 
+                    id: 'lobstr', 
+                    name: 'LOBSTR', 
+                    letter: 'L', 
+                    color: 'bg-[#0ea5e9]', 
+                    hasInstall: true, 
+                    installUrl: 'https://lobstr.co/' 
+                  }
+                ].map((w) => (
+                  <div
+                    key={w.id}
+                    onClick={() => {
+                      if (w.id === 'freighter') {
+                        setIsWalletKitOpen(false);
+                        handleLinkFreighter();
+                      } else if (w.hasInstall) {
+                        window.open(w.installUrl, '_blank');
+                      } else {
+                        setIsWalletKitOpen(false);
+                        // Simulate other wallets or handle connecting
+                        setErrorMessage(null);
+                        alert(`Stellar Wallets Kit: Connecting to ${w.name}...`);
+                      }
+                    }}
+                    className="flex items-center justify-between p-2.5 rounded-2xl hover:bg-slate-50 cursor-pointer transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-full ${w.color} flex items-center justify-center text-white text-sm font-extrabold shadow-sm`}>
+                        {w.letter}
+                      </div>
+                      <span className="text-xs font-semibold text-slate-800 group-hover:text-slate-950 transition-colors">
+                        {w.name}
+                      </span>
+                    </div>
+                    {w.hasInstall && (
+                      <a
+                        href={w.installUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center gap-0.5"
+                      >
+                        Install <span className="text-[8px] font-bold">↗</span>
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="border-t border-slate-100 pt-3 flex justify-center">
+                <span className="text-[10px] text-slate-400 font-medium font-sans">
+                  Powered by{' '}
+                  <a 
+                    href="https://stellarwalletskit.dev" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="underline hover:text-slate-600 transition-colors font-bold"
+                  >
+                    Stellar Wallets Kit
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Error notification banner */}
         {errorMessage && (

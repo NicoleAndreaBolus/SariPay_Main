@@ -33,11 +33,11 @@ SariPay B2B solves this by locking commercial payments into a secure, transparen
 * **Merchant (Retailer) Workspace**:
   * View Available Wallet Balances (XLM & equivalent PHP values).
   * Deposit/Lock payment funds safely inside the Soroban smart contract.
-  * Generate cryptographic Handoff QR Codes representing delivery checkmarks.
+  * Scan the Distributor's Handoff QR Code using their camera/wallet to confirm delivery receipt and authorize on-chain escrow release.
 * **Distributor (Supplier) Workspace**:
-  * Track "Guaranteed Revenue" locked in active escrow trust.
+  * Track "Guaranteed Revenue" locked in active escrow trust (escrow trust deducts and moves to available balance when settled).
   * Dispatch pending orders and track cargo transit statuses.
-  * Open the physical QR scanner to capture merchant codes and trigger payouts.
+  * Show/Generate the Cargo Handoff QR Code for the Merchant to scan.
 
 ### 2. Mobile-First Responsive Experience
 * **Bottom Navigation Menu**: Highly visible tabs (`Home`, `Orders`, `Wallet`, `Alerts`, `Profile`) designed for one-handed operation.
@@ -58,7 +58,7 @@ SariPay eliminates the need for physical cash or delayed bank transfers during B
 1. **Order Invoice Issued**: The supplier creates an order invoice.
 2. **Funds Locked (Trust)**: The merchant funds the order. The money is securely locked inside an isolated blockchain escrow container. The supplier sees that the funds are secured, but cannot withdraw them yet.
 3. **Dispatch & Cargo Transit**: Confident that payment is secured, the supplier ships the cargo to the merchant store.
-4. **QR Handoff & Release**: When the delivery driver arrives, the merchant shows a handoff QR code. The driver scans it. The escrow is instantly unlocked, sending the money to the supplier's wallet in under 5 seconds.
+4. **QR Handoff & Release**: When the delivery driver arrives, the driver presents the package/cargo handoff QR code. The Merchant scans it. Because the smart contract escrow requires authorization from the funding party (the Merchant), scanning triggers the transaction using the Merchant's wallet signature, instantly releasing the payout to the supplier in under 5 seconds.
 
 ---
 
@@ -71,9 +71,9 @@ You can test the entire B2B transaction cycle directly in the browser dashboard:
 3. **Lock the Funds (Deposit)**: Tap the new order in your list and click **Fund Escrow Contract**. You will see your *Available Balance* go down and your *Funds in Escrow Trust* go up.
 4. **Ship the Cargo (Supplier)**: Switch to the **Distributor Workspace** using the switcher pill at the top of the screen. Find your order in the deliveries list and click **Dispatch Cargo (Ship Order)**.
 5. **Release Payout via QR**: 
-   * Switch back to the **Merchant Workspace**, select the order, and click **Generate Handoff QR Code**.
-   * Switch to the **Distributor Workspace**, click **Open Scanner** (bottom-right floating button), and click the **Simulate Success Scan** button on the camera view.
-   * **Result**: The transaction completes, the merchant's trust holdings clear, and the supplier's wallet balance increases!
+   * Switch to the **Distributor Workspace** using the switcher pill at the top, select the order, and click **Show Handoff QR** (or present QR).
+   * Switch back to the **Merchant Workspace**, click **Open Delivery Scanner** (bottom-right floating button or table action), and scan the Distributor's QR code (you can simulate scanning in the dialog).
+   * **Result**: The transaction completes successfully because it is signed by the Merchant wallet (satisfying the contract's on-chain authorization requirement), clearing the escrow and transferring the payout to the distributor's wallet balance!
 
 ---
 

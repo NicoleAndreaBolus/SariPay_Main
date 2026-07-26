@@ -33,6 +33,11 @@
 
 *Figure 3: Live StellarExpert Testnet Explorer verifying active Soroban smart contract WASM deployment (`CDCYQTQY...`) and recent on-chain contract executions (`init_order`, `fund_order`, `confirm_delivery`).*
 
+### 4. Vercel Real-Time Analytics & Monitoring Telemetry
+![Vercel Analytics & Monitoring Logs](docs/screenshots/vercel_analytics.png)
+
+*Figure 4: Production monitoring dashboard on Vercel tracking real-time HTTP 200 telemetry, active `/api/sync` state transactions, and system health status.*
+
 ---
 
 ## 📖 Project Description

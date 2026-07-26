@@ -18,10 +18,15 @@
 
 ## 📸 Product Screenshots
 
-### Merchant Dashboard
+### 1. Merchant Desktop Dashboard
 ![Merchant Dashboard](docs/screenshots/merchant_dashboard.png)
 
 *Figure 1: Merchant Viewport showcasing real-time wallet balances (PHP & XLM), active purchase order queue, settlement states, and instant QR delivery verification controls.*
+
+### 2. Mobile Responsive Experience
+![Mobile Viewport](docs/screenshots/mobile_view.png)
+
+*Figure 2: Mobile Viewport optimized for store owners, featuring bottom tab navigation, quick action cards, recent escrow history, and floating QR camera scanner.*
 
 ---
 

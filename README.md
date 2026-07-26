@@ -16,6 +16,15 @@
 
 ---
 
+## 📸 Product Screenshots
+
+### Merchant Dashboard
+![Merchant Dashboard](docs/screenshots/merchant_dashboard.png)
+
+*Figure 1: Merchant Viewport showcasing real-time wallet balances (PHP & XLM), active purchase order queue, settlement states, and instant QR delivery verification controls.*
+
+---
+
 ## 📖 Project Description
 SariPay B2B is a decentralized, secure supply chain micro-escrow smart payment dApp optimized for small shop owners (sari-sari stores) and informal neighborhood merchants in Southeast Asia. 
 

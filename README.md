@@ -28,6 +28,11 @@
 
 *Figure 2: Mobile Viewport optimized for store owners, featuring bottom tab navigation, quick action cards, recent escrow history, and floating QR camera scanner.*
 
+### 3. Smart Contract Explorer & On-Chain Ledger Proof
+![StellarExpert Contract Explorer](docs/screenshots/contract_explorer.png)
+
+*Figure 3: Live StellarExpert Testnet Explorer verifying active Soroban smart contract WASM deployment (`CDCYQTQY...`) and recent on-chain contract executions (`init_order`, `fund_order`, `confirm_delivery`).*
+
 ---
 
 ## 📖 Project Description

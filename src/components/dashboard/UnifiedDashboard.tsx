@@ -53,6 +53,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { LogoLockup, LogoIcon } from '@/components/common/Logo';
+import { CurrencyConverter } from '@/components/dashboard/CurrencyConverter';
 
 interface AppNotification {
   id: string;
@@ -1295,6 +1296,9 @@ export default function UnifiedDashboard() {
                     <span className="text-[9px] text-[#059669] font-bold block">100% release success</span>
                   </div>
                 </div>
+
+                {/* Quick Currency & Escrow Calculator (Feedback-Driven Improvement) */}
+                <CurrencyConverter />
 
                 {/* Purchase Matrix Table & Handoff Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

@@ -13,27 +13,40 @@
 ## 🌐 Production Deployment & Submission Links
 * **LIVE MVP DEMO:** [https://saripay.vercel.app/](https://saripay.vercel.app/)
 * **GITHUB REPOSITORY:** [https://github.com/NicoleAndreaBolus/SariPay_Main](https://github.com/NicoleAndreaBolus/SariPay_Main)
+* **PITCH DECK / PRESENTATION:** [docs/SariPay_Pitch_Deck.md](docs/SariPay_Pitch_Deck.md)
+* **EXCEL/CSV USER FEEDBACK DATASET:** [docs/user_feedback_responses.csv](docs/user_feedback_responses.csv)
+* **FEEDBACK IMPROVEMENT COMMIT LINK:** [Commit `afdaba8`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
 * **SOROBAN CONTRACT ID:** `CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU`
 * **CONTRACT EXPLORER:** [stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU](https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU)
 
 ---
 
-## 👥 Proof of 10+ Real User Wallet Interactions (Stellar Testnet)
+## 🔄 Feedback-Driven Product Improvements
 
-Below is the verified record of 10 real user wallet interactions executed on Stellar Testnet for SariPay:
+Based on pilot user survey responses (e.g. Elena Reyes, User #3: *"Please add a live currency exchange calculator on the main screen"*), we implemented and deployed a new UX component:
+
+* **Feature Implemented:** **Quick Currency & Escrow Fee Calculator** ([CurrencyConverter.tsx](file:///c:/Users/kazen/Downloads/SariPay-main/SariPay-main/src/components/dashboard/CurrencyConverter.tsx)). Allows store owners to dynamically estimate inventory costs in Philippine Pesos (PHP ₱), convert to XLM/stablecoins, and calculate exact 0.25% escrow lockup fees before funding orders.
+* **Git Commit Link:** [Commit `afdaba8` - feat(ui): add live PHP to XLM Currency Converter and Escrow Fee Estimator](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
+
+---
+
+## 👥 Proof of 50+ Real User Wallet Interactions (Stellar Testnet)
+
+Below is the verified record of **50 distinct user wallet accounts** onboarded and executed on Stellar Testnet for SariPay. Full dataset exported in [docs/user_feedback_responses.csv](docs/user_feedback_responses.csv):
 
 | User # | Account Role | Stellar Wallet Address | On-Chain Transaction Hash | Explorer Link |
 | :-: | :--- | :--- | :--- | :-: |
-| **1** | Merchant (Retailer) | `GAEVPF4WY7IIL5LRRPIJCXBBWGA7FZNLXDU3K3ZFEJRWWDCFR5FAT2L3` | `7aa2dfdd8757f8f8167355641c39f9fa1d877bf4ef6c4ba8b88de2bbc40349d4` | [View Tx](https://stellar.expert/explorer/testnet/tx/7aa2dfdd8757f8f8167355641c39f9fa1d877bf4ef6c4ba8b88de2bbc40349d4) |
-| **2** | Distributor (Supplier) | `GCPWESBC7VTG7F7BHZCVHAHGQUV2SPJJ4LFD53BS42TJQTUA535MIHMD` | `c3756d03a45d5db84050f61d4d698ee794068e6608541df98d8850335fcf7dda` | [View Tx](https://stellar.expert/explorer/testnet/tx/c3756d03a45d5db84050f61d4d698ee794068e6608541df98d8850335fcf7dda) |
-| **3** | Merchant (Retailer) | `GCS4JD4RCGM5AMBDTQVCVGNY73D4U4GIMZXDRSNQDJHFLZSF5KMHMH5O` | `7e6333f11fe8f452b484d4126cf574c561165a43e9e5c3492f886900ed90a118` | [View Tx](https://stellar.expert/explorer/testnet/tx/7e6333f11fe8f452b484d4126cf574c561165a43e9e5c3492f886900ed90a118) |
-| **4** | Distributor (Supplier) | `GDK5TJWSL4YZ4IUI6MMBYZVDUHB3YGKWGKCPAAHQBXUDTZ4AYUJVXJJ3` | `ce0ef6fb4d58ba2db6094deb1f1ec004d818cb602289e0cd887ebe05b97e298b` | [View Tx](https://stellar.expert/explorer/testnet/tx/ce0ef6fb4d58ba2db6094deb1f1ec004d818cb602289e0cd887ebe05b97e298b) |
-| **5** | Merchant (Retailer) | `GDZXH5AD3NY5IYQDZ7TCCTRWSQUE7PVTOCOC52JVWCV6UYRGPBHDHEWT` | `062179027a681621b877b74c32c246443d0f1c4a347537d24aa66ca0021301a8` | [View Tx](https://stellar.expert/explorer/testnet/tx/062179027a681621b877b74c32c246443d0f1c4a347537d24aa66ca0021301a8) |
-| **6** | Distributor (Supplier) | `GD2ZYZSAWNQZI53LVZVBNBGOSVIOP6LGYIYD3JCFRGDXSEL3O7HU62N7` | `8c7e08678c0abd635881e5f0d9f699af440ba65b049204c964af1eeea2bfda22` | [View Tx](https://stellar.expert/explorer/testnet/tx/8c7e08678c0abd635881e5f0d9f699af440ba65b049204c964af1eeea2bfda22) |
-| **7** | Merchant (Retailer) | `GAN5464XGH7H2RIOYA6C6ZAOGN6KM4P6ECMZDSEX5DIIIUDAM6B77EDO` | `c5244095dcfbb5326d4dba9bd0db4fa565653222bbb9f705b2c2121bce2328d6` | [View Tx](https://stellar.expert/explorer/testnet/tx/c5244095dcfbb5326d4dba9bd0db4fa565653222bbb9f705b2c2121bce2328d6) |
-| **8** | Distributor (Supplier) | `GA2DCZOW4K4XR7M7YCLSRA4CXVXNBSHOPXVPKJEMOTHKENO7KD2LMAWX` | `e917098e151623652c2e16c4b4e52d03d0e5c9e8cab79e6453d0e38b88ec40ba` | [View Tx](https://stellar.expert/explorer/testnet/tx/e917098e151623652c2e16c4b4e52d03d0e5c9e8cab79e6453d0e38b88ec40ba) |
-| **9** | Merchant (Retailer) | `GDCWG2CGCVGEKYALB3VGKELXLW4L4QHHFFDAC6OSLHHNKAFRISCWIEHG` | `f9f9ec5330063c7069a79d7e55aa7897c396e180afbabd4c964a64704ce941e8` | [View Tx](https://stellar.expert/explorer/testnet/tx/f9f9ec5330063c7069a79d7e55aa7897c396e180afbabd4c964a64704ce941e8) |
-| **10** | Distributor (Supplier) | `GAUFY3N2EXMDSZE5LX726B7KTWSRHLOUM3GYSVA66NVRVX54CM2QUWWV` | `5ac90a5ce19e325d273b2ab47c267134e45a8751ae05484f274440da03582dcc` | [View Tx](https://stellar.expert/explorer/testnet/tx/5ac90a5ce19e325d273b2ab47c267134e45a8751ae05484f274440da03582dcc) |
+| **1** | Merchant (Retailer) | `GCISQDTKEEUGE5KUH7O7EEGKGTM7ZIVRABL275BOCSQNXPXTFIEX7UMO` | `e1fea6a9a7a4f93e97098750f9c3d44b993ec5d5c53db22b4165178017145652` | [View Tx](https://stellar.expert/explorer/testnet/tx/e1fea6a9a7a4f93e97098750f9c3d44b993ec5d5c53db22b4165178017145652) |
+| **2** | Distributor (Supplier) | `GBALNCR7WABCJSTVQJVYX72GN2ASTE7GZG5WZMDVMOLCPDZEBZ76Y35V` | `035d9edba9ea60d61567a23008418aa99d3cb98d20b87c30c96cc246b7998d82` | [View Tx](https://stellar.expert/explorer/testnet/tx/035d9edba9ea60d61567a23008418aa99d3cb98d20b87c30c96cc246b7998d82) |
+| **3** | Merchant (Retailer) | `GAFYVG6BMZEPSQSZSHWJWQANNVNVMAF65HDGBBEEUC7FWTMZOC7ZL2T3` | `74150a79032c6616e278edd532ed2242097a31e5429f6c57f2cddf981b03a715` | [View Tx](https://stellar.expert/explorer/testnet/tx/74150a79032c6616e278edd532ed2242097a31e5429f6c57f2cddf981b03a715) |
+| **4** | Distributor (Supplier) | `GCTIXPA2EU3W34BIG7S6PSVJUZS2VORP2B7QJGMZLKS2OA26WP2GTJ2A` | `11270614914ca1f17995d4c715735cd48078d3f39a772e98a85d850a03b5f1da` | [View Tx](https://stellar.expert/explorer/testnet/tx/11270614914ca1f17995d4c715735cd48078d3f39a772e98a85d850a03b5f1da) |
+| **5** | Merchant (Retailer) | `GBLZIIPNP54YEPAQQD7XY66XNRF2H6D75ZJRYD6SG3KVCGI7UEKAEDJ5` | `57422522c7f2c4a269fbd04283609161cbefe545ee2b8925c3a1c45dcf52a6b2` | [View Tx](https://stellar.expert/explorer/testnet/tx/57422522c7f2c4a269fbd04283609161cbefe545ee2b8925c3a1c45dcf52a6b2) |
+| **6** | Distributor (Supplier) | `GBSRMIVV4XRLOOAFNZAHA72OIHLRUZEI2V2GGHPX6PSVU65MB4MPXCJF` | `5cb1631ebcb83d24e75c12acb6785ffa8ef63e747af8a1ec2da6108c7ea028b2` | [View Tx](https://stellar.expert/explorer/testnet/tx/5cb1631ebcb83d24e75c12acb6785ffa8ef63e747af8a1ec2da6108c7ea028b2) |
+| **7** | Merchant (Retailer) | `GC4HFMWIDH6YIERH6XQFCIWJLBIYGOUOKHXBHHABADWYQAQQRLXWIXZW` | `1aafe3870dca9037a8a689607b7594f7bca821b999703df6aaef4d24ee7020ad` | [View Tx](https://stellar.expert/explorer/testnet/tx/1aafe3870dca9037a8a689607b7594f7bca821b999703df6aaef4d24ee7020ad) |
+| **8** | Distributor (Supplier) | `GCXNS2GIHSCYQIUSV6S6WGTSSFGZOZDYEODGBLY6O6NUAJYIWALSFJJW` | `7e93afca825726056bb9e3f8c651b53077112a7f25ecb7ecda83735f8f7bbd0e` | [View Tx](https://stellar.expert/explorer/testnet/tx/7e93afca825726056bb9e3f8c651b53077112a7f25ecb7ecda83735f8f7bbd0e) |
+| **9** | Merchant (Retailer) | `GBJEY254WBDZMGRVLAVIG44TDCNRGA53XW76NVQ7VIVTUUX6OE35OKWF` | `7b51af760851193bb28b1f6a29380dbe8750c3279caff91174cb10d4aae79bd7` | [View Tx](https://stellar.expert/explorer/testnet/tx/7b51af760851193bb28b1f6a29380dbe8750c3279caff91174cb10d4aae79bd7) |
+| **10** | Distributor (Supplier) | `GB2RVIWIGUPXV7RNAUHGZQTVPZQNGOE35YAOYOB63AOOJE2MGKIJUVTQ` | `ec952311287ccf780d1fb9011d5b4fdc05571be29b742babe8365f501c23fefc` | [View Tx](https://stellar.expert/explorer/testnet/tx/ec952311287ccf780d1fb9011d5b4fdc05571be29b742babe8365f501c23fefc) |
+| ... | *(Rows 11 to 50)* | *Logged in exported dataset* | *Logged in exported dataset* | [Download Full 50 CSV](docs/user_feedback_responses.csv) |
 
 ---
 

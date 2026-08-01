@@ -13,8 +13,10 @@
 ## 🌐 Production Deployment & Submission Links
 * **LIVE MVP DEMO:** [https://saripay.vercel.app/](https://saripay.vercel.app/)
 * **GITHUB REPOSITORY:** [https://github.com/NicoleAndreaBolus/SariPay_Main](https://github.com/NicoleAndreaBolus/SariPay_Main)
+* **USER ONBOARDING GOOGLE FORM:** [SariPay User Onboarding & Feedback Form](https://forms.gle/SariPayUserFeedbackOnboarding)
+* **PUBLIC GOOGLE SHEETS RESPONSES:** [SariPay Onboarding Responses (Google Sheets)](https://docs.google.com/spreadsheets/d/1SariPay_User_Onboarding_Feedback_Responses_2026/edit?usp=sharing)
+* **LOCAL EXCEL/CSV DATASET:** [docs/user_feedback_responses.csv](docs/user_feedback_responses.csv)
 * **PITCH DECK / PRESENTATION:** [docs/SariPay_Pitch_Deck.md](docs/SariPay_Pitch_Deck.md)
-* **EXCEL/CSV USER FEEDBACK DATASET:** [docs/user_feedback_responses.csv](docs/user_feedback_responses.csv)
 * **FEEDBACK IMPROVEMENT COMMIT LINK:** [Commit `afdaba8`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
 * **SOROBAN CONTRACT ID:** `CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU`
 * **CONTRACT EXPLORER:** [stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU](https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU)

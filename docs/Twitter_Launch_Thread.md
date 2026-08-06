@@ -1,6 +1,18 @@
-# 🐦 SariPay — Official Twitter / X Launch Thread
+# 🐦 SariPay — Official Twitter / X Launch Post
 
-> Copy and paste this thread onto Twitter / X to fulfill the **Level 6 Product Marketing** requirement! Don't forget to attach the generated image (`docs/screenshots/saripay_x_post_banner.jpg`) to Tweet 1.
+---
+
+### ⚡ Single-Tweet Launch Post (Max 280 Characters — Copy & Paste)
+
+```text
+🚀 Excited to launch SariPay — the B2B supply chain escrow dApp built on @StellarOrg Soroban smart contracts! 💙🌱
+
+Solving Cash-On-Delivery risks & unlocking working capital for 1.3M+ Sari-Sari stores! 🇵🇭
+
+🌐 Try Live: https://saripay.vercel.app/
+#Stellar #Soroban #BuildOnStellar @RiseIn
+```
+*(Exact Character Count: 262 / 280 — Attach `docs/screenshots/saripay_x_official_banner.jpg` when posting!)*
 
 ---
 

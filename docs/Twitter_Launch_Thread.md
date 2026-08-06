@@ -38,4 +38,5 @@ SariPay locks stablecoin payments into a Soroban smart contract escrow upon orde
 ---
 
 ### 📷 Banner Asset to Attach:
-Image file location: [`docs/screenshots/saripay_x_post_banner.jpg`](file:///c:/Users/kazen/Downloads/SariPay-main/SariPay-main/docs/screenshots/saripay_x_post_banner.jpg)
+Image file location: [`docs/screenshots/saripay_x_official_banner.jpg`](file:///c:/Users/kazen/Downloads/SariPay-main/SariPay-main/docs/screenshots/saripay_x_official_banner.jpg)
+Live Web Link: [https://saripay.vercel.app/screenshots/saripay_x_official_banner.jpg](https://saripay.vercel.app/screenshots/saripay_x_official_banner.jpg)

@@ -17,6 +17,7 @@
 * **PUBLIC GOOGLE SHEETS RESPONSES:** [SariPay Onboarding Responses (Google Sheets)](https://docs.google.com/spreadsheets/d/1BMG8YuL83RXhQrLHQFCj6hDyVKFSXRSg8chhIHgqBaA/edit?usp=sharing)
 * **LOCAL EXCEL/CSV DATASET:** [docs/user_feedback_responses.csv](docs/user_feedback_responses.csv)
 * **PITCH DECK / PRESENTATION:** [docs/SariPay_Pitch_Deck.md](docs/SariPay_Pitch_Deck.md)
+* **TWITTER / X LAUNCH THREAD & BANNER:** [docs/Twitter_Launch_Thread.md](docs/Twitter_Launch_Thread.md)
 * **FEEDBACK IMPROVEMENT COMMIT LINK:** [Commit `afdaba8`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
 * **SOROBAN CONTRACT ID:** `CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU`
 * **CONTRACT EXPLORER:** [stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU](https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU)

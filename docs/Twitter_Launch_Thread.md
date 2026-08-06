@@ -1,32 +1,46 @@
-# 🐦 SariPay — Official Twitter / X Launch Post
+# 🐦 SariPay — Official Twitter / X 3-Tweet Launch Thread
 
 ---
 
-### ⚡ Option 1: Shorter Single-Tweet (247 Characters — Recommended)
+### 🧵 Tweet 1 of 3 (Main Announcement — Attach Banner Image)
 
 ```text
-🚀 Excited to launch SariPay — the B2B supply chain escrow dApp built on @StellarOrg Soroban! 💙🌱
+🚀 Excited to announce SariPay — the B2B supply chain micro-escrow network built natively on @StellarOrg Soroban smart contracts! 💙🌱
 
-Solving Cash-on-Delivery risks & unlocking capital for 1.3M+ Sari-Sari stores! 🇵🇭
+Solving Cash-On-Delivery risks & unlocking working capital for 1.3M+ Sari-Sari stores! 🇵🇭
 
 🌐 Try Live: https://saripay.vercel.app/
-#Stellar #Soroban #BuildOnStellar @RiseIn
+#Stellar #Soroban @RiseIn
 ```
-*(Exact Character Count: 247 / 280 — 33 characters under the limit!)*
+*(Exact Length: 254 / 280 Characters — Attach `saripay_x_official_banner.jpg` when posting!)*
 
 ---
 
-### ⚡ Option 2: Ultra-Compact Single-Tweet (236 Characters)
+### 🧵 Tweet 2 of 3 (Problem & Solution)
 
 ```text
-🚀 Launching SariPay — B2B supply chain micro-escrow powered by @StellarOrg Soroban! 💙🌱
+1/ 📦 The Problem:
+Informal retail supply chains face massive friction. Merchants risk upfront payments for missing stock, while suppliers face unpaid inventory on Cash-on-Delivery (COD).
 
-Solving COD risks & unlocking working capital for 1.3M+ Sari-Sari stores! 🇵🇭
-
-🌐 Try Live: https://saripay.vercel.app/
-#Stellar #Soroban #BuildOnStellar @RiseIn
+2/ 🔒 The Solution:
+SariPay locks stablecoins in Soroban escrow, releasing payout in <5s via QR scan!
 ```
-*(Exact Character Count: 236 / 280 — 44 characters under the limit!)*
+*(Exact Length: 271 / 280 Characters)*
+
+---
+
+### 🧵 Tweet 3 of 3 (Technical Highlights & Links)
+
+```text
+3/ ⚡ Built on Stellar:
+• Sub-cent fees & sub-second settlement
+• Instant QR delivery handoff
+• Soroban Rust Smart Contracts
+
+📂 Open Source Repo: https://github.com/NicoleAndreaBolus/SariPay_Main
+🔍 On-Chain Contract: https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU
+```
+*(Exact Length: 279 / 280 Characters)*
 
 ---
 

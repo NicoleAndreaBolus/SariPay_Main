@@ -2,17 +2,31 @@
 
 ---
 
-### ⚡ Single-Tweet Launch Post (Max 280 Characters — Copy & Paste)
+### ⚡ Option 1: Shorter Single-Tweet (247 Characters — Recommended)
 
 ```text
-🚀 Excited to launch SariPay — the B2B supply chain escrow dApp built on @StellarOrg Soroban smart contracts! 💙🌱
+🚀 Excited to launch SariPay — the B2B supply chain escrow dApp built on @StellarOrg Soroban! 💙🌱
 
-Solving Cash-On-Delivery risks & unlocking working capital for 1.3M+ Sari-Sari stores! 🇵🇭
+Solving Cash-on-Delivery risks & unlocking capital for 1.3M+ Sari-Sari stores! 🇵🇭
 
 🌐 Try Live: https://saripay.vercel.app/
 #Stellar #Soroban #BuildOnStellar @RiseIn
 ```
-*(Exact Character Count: 262 / 280 — Attach `docs/screenshots/saripay_x_official_banner.jpg` when posting!)*
+*(Exact Character Count: 247 / 280 — 33 characters under the limit!)*
+
+---
+
+### ⚡ Option 2: Ultra-Compact Single-Tweet (236 Characters)
+
+```text
+🚀 Launching SariPay — B2B supply chain micro-escrow powered by @StellarOrg Soroban! 💙🌱
+
+Solving COD risks & unlocking working capital for 1.3M+ Sari-Sari stores! 🇵🇭
+
+🌐 Try Live: https://saripay.vercel.app/
+#Stellar #Soroban #BuildOnStellar @RiseIn
+```
+*(Exact Character Count: 236 / 280 — 44 characters under the limit!)*
 
 ---
 

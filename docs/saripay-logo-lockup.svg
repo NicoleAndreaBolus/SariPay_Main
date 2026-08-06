@@ -1,0 +1,52 @@
+<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="saripay-logo-grad-full" x1="15" y1="10" x2="85" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#34D399" />
+      <stop offset="50%" stopColor="#10B981" />
+      <stop offset="100%" stopColor="#059669" />
+    </linearGradient>
+  </defs>
+
+  {/* Icon Shield */}
+  <g transform="translate(10, 10) scale(0.5)">
+    <path
+      d="M100 28 L162 44 C162 44 162 82 138 116 C121 140 100 162 100 162 C100 162 79 140 62 116 C38 82 38 44 38 44 L100 28 Z"
+      stroke="url(#saripay-logo-grad-full)"
+      strokeWidth="11"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M65 72 C52 84 52 104 65 116 C76 127 94 127 105 116"
+      stroke="url(#saripay-logo-grad-full)"
+      strokeWidth="10"
+      strokeLinecap="round"
+    />
+    <path
+      d="M135 72 C148 84 148 104 135 116 C124 127 106 127 95 116"
+      stroke="url(#saripay-logo-grad-full)"
+      strokeWidth="10"
+      strokeLinecap="round"
+    />
+    <path
+      d="M100 105 C85 86 63 106 100 144 C137 106 115 86 100 105 Z"
+      stroke="url(#saripay-logo-grad-full)"
+      strokeWidth="9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="#F8FAFC"
+    />
+    <path
+      d="M86 118 L96 127 L117 107"
+      stroke="url(#saripay-logo-grad-full)"
+      strokeWidth="9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </g>
+
+  {/* Text Lockup */}
+  <text x="120" y="72" font-family="Inter, Manrope, system-ui, sans-serif" font-size="52" font-weight="800" fill="#111827" letter-spacing="-1">
+    Sari<tspan fill="#059669">Pay</tspan>
+  </text>
+</svg>

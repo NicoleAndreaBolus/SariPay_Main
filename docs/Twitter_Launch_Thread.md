@@ -20,12 +20,12 @@ Solving Cash-On-Delivery risks & unlocking working capital for 1.3M+ Sari-Sari s
 
 ```text
 1/ 📦 The Problem:
-Informal retail supply chains face massive friction. Merchants risk upfront payments for missing stock, while suppliers face unpaid inventory on Cash-on-Delivery (COD).
+Informal retail supply chains face huge friction. Merchants risk paying for lost stock, while suppliers face unpaid Cash-on-Delivery inventory.
 
 2/ 🔒 The Solution:
-SariPay locks stablecoins in Soroban escrow, releasing payout in <5s via QR scan!
+SariPay locks stablecoins in Soroban escrow, releasing payouts in <5s via QR scan!
 ```
-*(Exact Length: 271 / 280 Characters)*
+*(Exact Length: 247 / 280 Characters — 33 characters under the limit!)*
 
 ---
 

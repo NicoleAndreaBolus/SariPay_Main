@@ -20,10 +20,22 @@
 * **PITCH DECK / PRESENTATION:** [docs/SariPay_Pitch_Deck.md](docs/SariPay_Pitch_Deck.md)
 * **SMART CONTRACT SECURITY AUDIT:** [docs/SariPay_Security_Audit.md](docs/SariPay_Security_Audit.md)
 * **ECOSYSTEM TECHNICAL TUTORIAL:** [docs/SariPay_Developer_Tutorial.md](docs/SariPay_Developer_Tutorial.md)
+* **MAINNET DEPLOYMENT GUIDE:** [docs/Mainnet_Deployment_Guide.md](docs/Mainnet_Deployment_Guide.md)
+* **ADVANCED FEATURE (BLACK BELT):** [Gasless Fee Sponsorship Service](src/services/feeSponsorship.ts)
 * **TWITTER / X LAUNCH THREAD & BANNER:** [docs/Twitter_Launch_Thread.md](docs/Twitter_Launch_Thread.md)
 * **FEEDBACK IMPROVEMENT COMMIT LINK:** [Commit `afdaba8`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
 * **SOROBAN CONTRACT ID:** `CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU`
 * **CONTRACT EXPLORER:** [stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU](https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU)
+
+---
+
+## ⚡ Advanced Feature (Black Belt Track): Gasless Fee Sponsorship
+
+To eliminate friction for non-crypto-native neighborhood store owners (*Sari-Sari* merchants), SariPay implements **Stellar Fee Sponsorship (Gasless Transactions)** using native `FeeBumpTransaction` mechanics:
+
+* **How It Works:** The merchant constructs and signs their supply escrow funding or delivery transaction. Before on-chain broadcast, the SariPay relayer service wraps the transaction into a Fee-Bump envelope via `buildSponsoredFeeBumpTx()`, paying all network gas fees on behalf of the merchant.
+* **Result:** Store owners never need to acquire or hold reserve XLM to pay gas fees—achieving a seamless Web2-like user experience powered by Web3 smart contracts.
+* **Implementation Source:** [`src/services/feeSponsorship.ts`](src/services/feeSponsorship.ts)
 
 ---
 

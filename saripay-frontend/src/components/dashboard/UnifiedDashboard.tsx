@@ -53,6 +53,10 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { LogoLockup, LogoIcon } from '@/components/common/Logo';
+import { CurrencyConverter } from '@/components/dashboard/CurrencyConverter';
+import { DeliveryReceiptModal } from '@/components/dashboard/DeliveryReceiptModal';
+import { DisputeModal } from '@/components/dashboard/DisputeModal';
+import { QRScannerModal } from '@/components/dashboard/QRScannerModal';
 
 interface AppNotification {
   id: string;
@@ -195,6 +199,9 @@ export default function UnifiedDashboard() {
   const [invoiceDetails, setInvoiceDetails] = useState('');
   const [invoiceError, setInvoiceError] = useState<string | null>(null);
   const [isSubmittingInvoice, setIsSubmittingInvoice] = useState(false);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [lastSettledTxHash, setLastSettledTxHash] = useState<string>('7aa2dfdd8757f8f8167355641c39f9fa1d877bf4ef6c4ba8b88de2bbc40349d4');
 
   const [alertConfig, setAlertConfig] = useState<{
     isOpen: boolean;
@@ -645,6 +652,7 @@ export default function UnifiedDashboard() {
       const success = await confirmDelivery(selectedOrder.id, walletAddress);
       if (success) {
         addNotification("Escrow Released", `Delivery verified for Order #${selectedOrder.id}. Funds released to supplier.`, "success");
+        setIsReceiptModalOpen(true);
         confetti({
           particleCount: 150,
           spread: 80,
@@ -1295,6 +1303,9 @@ export default function UnifiedDashboard() {
                     <span className="text-[9px] text-[#059669] font-bold block">100% release success</span>
                   </div>
                 </div>
+
+                {/* Quick Currency & Escrow Calculator (Feedback-Driven Improvement) */}
+                <CurrencyConverter />
 
                 {/* Purchase Matrix Table & Handoff Layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -3945,6 +3956,37 @@ export default function UnifiedDashboard() {
           </div>
         </div>
       </Modal>
+
+      {/* NEW DIGITAL DELIVERY RECEIPT MODAL */}
+      {selectedOrder && (
+        <DeliveryReceiptModal
+          isOpen={isReceiptModalOpen}
+          onClose={() => setIsReceiptModalOpen(false)}
+          orderId={selectedOrder.id}
+          merchantName={selectedOrder.merchantName || 'Nicole Corner Store'}
+          supplierName={selectedOrder.supplier || 'Santos FMCG Wholesale'}
+          amountXlm={selectedOrder.amount}
+          amountPhp={(parseFloat(selectedOrder.amount) * 56.5).toFixed(2)}
+          txHash={lastSettledTxHash}
+          date={selectedOrder.date}
+        />
+      )}
+
+      {/* NEW SMART ESCROW DISPUTE & REFUND MODAL */}
+      {selectedOrder && (
+        <DisputeModal
+          isOpen={isDisputeModalOpen}
+          onClose={() => setIsDisputeModalOpen(false)}
+          orderId={selectedOrder.id}
+          merchantName={selectedOrder.merchantName || 'Nicole Corner Store'}
+          supplierName={selectedOrder.supplier || 'Santos FMCG Wholesale'}
+          amountXlm={selectedOrder.amount}
+          amountPhp={(parseFloat(selectedOrder.amount) * 56.5).toFixed(2)}
+          onConfirmDispute={(reason, details) => {
+            addNotification("Dispute Filed", `Escrow locked for Order #${selectedOrder.id}. Merchant refund pending verification.`, "warning");
+          }}
+        />
+      )}
 
     </>
   );

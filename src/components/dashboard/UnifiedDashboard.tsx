@@ -1713,6 +1713,52 @@ export default function UnifiedDashboard() {
                   </div>
                 </div>
 
+                {/* Guaranteed Revenue & Logistics Cashflow Pipeline Banner */}
+                <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 p-6 sm:p-7 rounded-3xl border border-emerald-500/20 text-white flex flex-col gap-5 shadow-xl relative overflow-hidden">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+                    <div className="flex items-center gap-2.5">
+                      <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                      <div>
+                        <h3 className="text-sm font-extrabold text-white tracking-tight">Guaranteed Payout & Logistics Cashflow Pipeline</h3>
+                        <p className="text-[11px] text-slate-400">Smart contract escrow safeguards distributor capital before truck dispatch</p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      STELLAR SOROBAN ESCROW ACTIVE
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-white/5 border border-blue-500/30 p-4 rounded-2xl flex flex-col justify-between">
+                      <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-blue-400">
+                        <span>1. Locked in Escrow</span>
+                        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                      </div>
+                      <span className="text-xl font-black text-white mt-1.5">₱{(parseFloat(distributorStats.guaranteedRevenue) * xlmPrice).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      <span className="text-[10px] text-slate-400 mt-1">100% Capital Guaranteed • Safe to Ship</span>
+                    </div>
+
+                    <div className="bg-white/5 border border-amber-500/30 p-4 rounded-2xl flex flex-col justify-between">
+                      <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-amber-400">
+                        <span>2. Out for Delivery</span>
+                        <Truck className="w-3.5 h-3.5 text-amber-400" />
+                      </div>
+                      <span className="text-xl font-black text-white mt-1.5">{distributorStats.pendingDeliveries} Deliveries</span>
+                      <span className="text-[10px] text-slate-400 mt-1">En route on trucks • Awaiting QR Handoff</span>
+                    </div>
+
+                    <div className="bg-white/5 border border-emerald-500/30 p-4 rounded-2xl flex flex-col justify-between">
+                      <div className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">
+                        <span>3. Settled Payouts</span>
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                      </div>
+                      <span className="text-xl font-black text-white mt-1.5">{distributorStats.completedDeliveries} Released</span>
+                      <span className="text-[10px] text-slate-400 mt-1">Instant finality • Direct to Distributor Wallet</span>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Metrics cards grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
@@ -1789,38 +1835,58 @@ export default function UnifiedDashboard() {
                                 <td className="py-4 font-bold text-[#111827]">{order.amount} XLM</td>
                                 <td className="py-4">{getStatusBadge(order.status)}</td>
                                 <td className="py-4 text-right">
-                                  {order.status === 'Initialized' ? (
-                                    <span className="text-[11px] text-amber-600 font-semibold">Awaiting Deposit</span>
-                                  ) : order.status === 'Funded' ? (
-                                    <Button
-                                      variant="primary"
-                                      size="sm"
-                                      onClick={() => handleShipOrder(order.id)}
-                                      isLoading={isShippingId === order.id}
-                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
-                                          ? 'bg-[#059669] hover:bg-[#10B981] text-white'
-                                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                        }`}
-                                    >
-                                      Ship Order
-                                    </Button>
-                                  ) : order.status === 'In Transit' ? (
-                                    <Button
-                                      variant="secondary"
-                                      size="sm"
-                                      onClick={() => openQrModal(order)}
-                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className={`border text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
-                                          ? 'border-[#E5E7EB] hover:bg-stone-50 text-[#111827]'
-                                          : 'border-stone-200 text-stone-400 bg-stone-50 cursor-not-allowed'
-                                        }`}
-                                    >
-                                      Show Handoff QR
-                                    </Button>
-                                  ) : (
-                                    <span className="text-[11px] text-[#059669] font-bold">✓ Settled</span>
-                                  )}
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    {order.status === 'Initialized' && (
+                                      <span className="text-[11px] text-amber-600 font-semibold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-lg">
+                                        ⏳ Awaiting Escrow
+                                      </span>
+                                    )}
+
+                                    {order.status === 'Funded' && (
+                                      <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => handleShipOrder(order.id)}
+                                        isLoading={isShippingId === order.id}
+                                        disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                        className={`text-[11px] font-bold py-1 px-3 rounded-xl cursor-pointer flex items-center gap-1.5 ${activeWorkspace.verificationStatus === 'Verified'
+                                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
+                                            : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                                          }`}
+                                      >
+                                        <Truck className="w-3.5 h-3.5" /> Dispatch & Ship
+                                      </Button>
+                                    )}
+
+                                    {order.status === 'In Transit' && (
+                                      <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => openQrModal(order)}
+                                        disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                        className={`text-[11px] font-bold py-1 px-3 rounded-xl cursor-pointer flex items-center gap-1.5 ${activeWorkspace.verificationStatus === 'Verified'
+                                            ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 shadow-xs'
+                                            : 'border-stone-200 text-stone-400 bg-stone-50 cursor-not-allowed'
+                                          }`}
+                                      >
+                                        <QrCode className="w-3.5 h-3.5 text-amber-700" /> Driver Handoff QR
+                                      </Button>
+                                    )}
+
+                                    {order.status === 'Delivered' && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedOrder(order);
+                                          setLastSettledTxHash('6a6a3af1b560dcb01001eb59aa6d58e04d5b100bbc0cbadc41b78d464e1dd6c2');
+                                          setIsReceiptModalOpen(true);
+                                        }}
+                                        className="text-[11px] font-bold py-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                                      >
+                                        <Receipt className="w-3 h-3 text-emerald-600" /> Receipt ↗
+                                      </button>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                             ))}
@@ -1843,34 +1909,50 @@ export default function UnifiedDashboard() {
                                   {order.merchantAddress || "Tondo, Manila"}
                                 </p>
                               </div>
-                              <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1">
+                              <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1 flex-wrap gap-2">
                                 <span className="font-bold text-[#111827] text-xs">{order.amount} XLM</span>
-                                <div>
-                                  {order.status === 'Initialized' ? (
+                                <div className="flex items-center gap-1.5">
+                                  {order.status === 'Initialized' && (
                                     <span className="text-xs text-amber-600 font-semibold">Awaiting Deposit</span>
-                                  ) : order.status === 'Funded' ? (
+                                  )}
+
+                                  {order.status === 'Funded' && (
                                     <Button
                                       variant="primary"
                                       size="sm"
                                       onClick={() => handleShipOrder(order.id)}
                                       isLoading={isShippingId === order.id}
                                       disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className="bg-[#059669] text-[11px]"
+                                      className="bg-emerald-600 text-white text-[11px] font-bold py-1 px-2.5 rounded-lg flex items-center gap-1"
                                     >
-                                      Ship Order
+                                      <Truck className="w-3 h-3" /> Ship
                                     </Button>
-                                  ) : order.status === 'In Transit' ? (
+                                  )}
+
+                                  {order.status === 'In Transit' && (
                                     <Button
                                       variant="secondary"
                                       size="sm"
                                       onClick={() => openQrModal(order)}
                                       disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className="border border-[#E5E7EB] text-[11px] font-semibold"
+                                      className="border border-amber-200 bg-amber-50 text-amber-900 text-[11px] font-bold py-1 px-2.5 rounded-lg flex items-center gap-1"
                                     >
-                                      Show QR
+                                      <QrCode className="w-3 h-3 text-amber-700" /> Driver QR
                                     </Button>
-                                  ) : (
-                                    <span className="text-xs text-[#059669] font-bold">✓ Settled</span>
+                                  )}
+
+                                  {order.status === 'Delivered' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedOrder(order);
+                                        setLastSettledTxHash('6a6a3af1b560dcb01001eb59aa6d58e04d5b100bbc0cbadc41b78d464e1dd6c2');
+                                        setIsReceiptModalOpen(true);
+                                      }}
+                                      className="text-[11px] font-bold py-1 px-2.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-lg flex items-center gap-1"
+                                    >
+                                      <Receipt className="w-3 h-3 text-emerald-600" /> Receipt
+                                    </button>
                                   )}
                                 </div>
                               </div>
@@ -3686,6 +3768,58 @@ export default function UnifiedDashboard() {
         title="Initialize New Purchase Invoice"
       >
         <form onSubmit={handleCreateInvoiceSubmit} className="flex flex-col gap-4">
+          
+          {/* Quick Select Registered Merchant */}
+          <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl flex flex-col gap-2">
+            <label className="text-xs font-bold text-slate-700 block">
+              ⚡ Quick Select Registered Merchant
+            </label>
+            <select
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val) return;
+                const [name, addr] = val.split('||');
+                setInvoiceMerchantName(name);
+                setInvoiceMerchantAddr(addr);
+              }}
+              disabled={isSubmittingInvoice}
+              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-emerald-500"
+            >
+              <option value="">-- Choose a Registered Store to Auto-Fill --</option>
+              <option value="Maria Santos's Sari-Sari Store||GCISQDTKEEUGE5KUH7O7EEGKGTM7ZIVRABL275BOCSQNXPXTFIEX7UMO">Maria Santos's Sari-Sari Store (Quezon City)</option>
+              <option value="Elena Reyes's Sari-Sari Store||GAFYVG6BMZEPSQSZSHWJWQANNVNVMAF65HDGBBEEUC7FWTMZOC7ZL2T3">Elena Reyes's Grocery (Manila)</option>
+              <option value="Ana Mendoza's Mini-Mart||GBLZIIPNP54YEPAQQD7XY66XNRF2H6D75ZJRYD6SG3KVCGI7UEKAEDJ5">Ana Mendoza's Mini-Mart (Pasig City)</option>
+              <option value="Teresa Aquino's Store||GC4HFMWIDH6YIERH6XQFCIWJLBIYGOUOKHXBHHABADWYQAQQRLXWIXZW">Teresa Aquino's Store (Makati City)</option>
+              <option value="Lucia Torres's Variety Store||GBJEY254WBDZMGRVLAVIG44TDCNRGA53XW76NVQ7VIVTUUX6OE35OKWF">Lucia Torres's Variety Store (Taguig City)</option>
+            </select>
+          </div>
+
+          {/* Quick Wholesale Package Presets */}
+          <div>
+            <label className="text-[11px] font-bold text-slate-500 block mb-1.5">
+              Wholesale Package Presets
+            </label>
+            <div className="flex gap-1.5 flex-wrap">
+              {[
+                { label: "☕ Coffee Bundle (32.74 XLM)", amount: "32.74", details: "10x Great Taste White Coffee Boxes" },
+                { label: "🌾 Rice Sacks (110.50 XLM)", amount: "110.50", details: "5x Sinandomeng Special Rice 25kg Sacks" },
+                { label: "🍜 Noodles Carton (56.63 XLM)", amount: "56.63", details: "12x Lucky Me Pancit Canton Kalamansi Cartons" }
+              ].map(preset => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => {
+                    setInvoiceAmount(preset.amount);
+                    setInvoiceDetails(preset.details);
+                  }}
+                  className="text-[10px] font-bold px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg cursor-pointer transition-colors"
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <Input
             label="Merchant Name / Store"
             placeholder="e.g. Nena's Sari-Sari Store"

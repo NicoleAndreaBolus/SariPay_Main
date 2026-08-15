@@ -31,7 +31,7 @@
 * **LEVEL 5 FEATURE COMMIT (Currency Calculator):** [Commit `afdaba8`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
 * **LEVEL 6 FEATURE COMMIT (Fee Sponsorship & Mainnet):** [Commit `15d961e`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/15d961e)
 * **LEVEL 7 FEATURE COMMIT (Delivery Receipt & Reports):** [Commit `6bf7e89`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/6bf7e89)
-* **MAJOR PRODUCT UPGRADE COMMIT (Live Feed & Scanner):** [Commit `b81ec9d`](https://github.com/NicoleAndreaBolus/SariPay_Main)
+* **MAJOR PRODUCT UPGRADE COMMIT (Live Feed & Scanner):** [Commit `49c9332`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/49c9332)
 * **SOROBAN CONTRACT ID:** `CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU`
 * **CONTRACT EXPLORER:** [stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU](https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU)
 

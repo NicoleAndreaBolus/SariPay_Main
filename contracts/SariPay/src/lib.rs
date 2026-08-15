@@ -86,6 +86,24 @@ impl SariPayB2BContract {
         env.storage().instance().set(&key, &order);
     }
 
+    /// Merchant can dispute damaged or missing goods, triggering an immediate escrow refund
+    pub fn dispute_order(env: Env, order_id: u64) {
+        let key = DataKey::Order(order_id);
+        let mut order: SupplyOrder = env.storage().instance().get(&key).expect("Order not found");
+        
+        order.merchant.require_auth();
+        if order.status != OrderStatus::Funded {
+            panic!("Only funded orders can be disputed");
+        }
+
+        // Refund escrow directly back to merchant wallet
+        let token_client = token::Client::new(&env, &order.token);
+        token_client.transfer(&env.current_contract_address(), &order.merchant, &order.amount);
+
+        order.status = OrderStatus::Canceled;
+        env.storage().instance().set(&key, &order);
+    }
+
     /// Allows the distributor to programmatically reject or cancel an unfulfilled order
     pub fn cancel_order(env: Env, order_id: u64) {
         let key = DataKey::Order(order_id);

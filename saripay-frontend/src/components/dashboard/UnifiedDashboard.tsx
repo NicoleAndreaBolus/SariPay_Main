@@ -4101,7 +4101,29 @@ export default function UnifiedDashboard() {
           amountXlm={selectedOrder.amount}
           amountPhp={(parseFloat(selectedOrder.amount) * 56.5).toFixed(2)}
           onConfirmDispute={(reason, details) => {
-            addNotification("Dispute Filed", `Escrow locked for Order #${selectedOrder.id}. Merchant refund pending verification.`, "warning");
+            const newDispute = {
+              id: `DISP-${Math.floor(100 + Math.random() * 900)}`,
+              orderId: selectedOrder.id,
+              merchant: selectedOrder.merchantName || activeWorkspace?.name || 'My Sari-Sari Store',
+              distributor: selectedOrder.supplier || 'Santos FMCG Wholesale',
+              status: 'Open' as const,
+              createdDate: new Date().toISOString().split('T')[0],
+              details: `${reason}: ${details || 'Merchant reported damaged or missing inventory.'}`,
+              evidence: ['damaged_goods_photo.jpg', 'delivery_receipt.pdf'],
+              notes: 'Filed by merchant via SariPay Smart Escrow Dispute Protocol.'
+            };
+
+            if (typeof window !== 'undefined') {
+              const existing = JSON.parse(localStorage.getItem('saripay_disputes') || '[]');
+              localStorage.setItem('saripay_disputes', JSON.stringify([newDispute, ...existing]));
+            }
+
+            const updatedOrders = orders.map(o => 
+              o.id === selectedOrder.id ? { ...o, status: 'Canceled' as const } : o
+            );
+            saveOrders(updatedOrders);
+            syncWithServer();
+            addNotification("Dispute Filed", `Escrow locked for Order #${selectedOrder.id}. Case ${newDispute.id} routed to Admin Resolution Center.`, "warning");
           }}
         />
       )}

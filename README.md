@@ -24,11 +24,29 @@
 * **ECOSYSTEM TECHNICAL TUTORIAL:** [docs/SariPay_Developer_Tutorial.md](docs/SariPay_Developer_Tutorial.md)
 * **MAINNET DEPLOYMENT GUIDE:** [docs/Mainnet_Deployment_Guide.md](docs/Mainnet_Deployment_Guide.md)
 * **ADVANCED FEATURE (BLACK BELT):** [Gasless Fee Sponsorship Service](src/services/feeSponsorship.ts)
+* **LIVE ON-CHAIN LANDING FEED:** [src/components/home/LiveActivityFeed.tsx](src/components/home/LiveActivityFeed.tsx)
+* **DELIVERY QR SCANNER ENGINE:** [src/components/dashboard/QRScannerModal.tsx](src/components/dashboard/QRScannerModal.tsx)
+* **ESCROW DISPUTE & REFUND PROTOCOL:** [src/components/dashboard/DisputeModal.tsx](src/components/dashboard/DisputeModal.tsx)
 * **TWITTER / X LAUNCH THREAD & BANNER:** [docs/Twitter_Launch_Thread.md](docs/Twitter_Launch_Thread.md)
 * **LEVEL 5 FEATURE COMMIT (Currency Calculator):** [Commit `afdaba8`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/afdaba8)
-* **LEVEL 7 FEATURE COMMIT (Delivery Receipt):** [Commit `6bf7e89`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/6bf7e89)
+* **LEVEL 6 FEATURE COMMIT (Fee Sponsorship & Mainnet):** [Commit `15d961e`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/15d961e)
+* **LEVEL 7 FEATURE COMMIT (Delivery Receipt & Reports):** [Commit `6bf7e89`](https://github.com/NicoleAndreaBolus/SariPay_Main/commit/6bf7e89)
+* **MAJOR PRODUCT UPGRADE COMMIT (Live Feed & Scanner):** [Commit `b81ec9d`](https://github.com/NicoleAndreaBolus/SariPay_Main)
 * **SOROBAN CONTRACT ID:** `CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU`
 * **CONTRACT EXPLORER:** [stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU](https://stellar.expert/explorer/testnet/contract/CDCYQTQY5TETNSKHGNCJQXDPEUTDAQY4AONAQQPTBLICTDVAVE3VOPDU)
+
+---
+
+## 🌟 Major Technical Upgrades & Product Enhancements
+
+1. **Live On-Chain Transaction & Escrow Feed on Homepage ([LiveActivityFeed.tsx](src/components/home/LiveActivityFeed.tsx)):**
+   * Real-time settlement activity stream showcasing live delivery handoffs, settled amounts in PHP/XLM, and verifiable on-chain Stellar transaction hashes.
+2. **Camera-Based Delivery Handoff QR Scanner ([QRScannerModal.tsx](src/components/dashboard/QRScannerModal.tsx)):**
+   * Real-time mobile video feed scanner for instant physical-to-digital retail proof-of-delivery with image upload fallback.
+3. **Smart Escrow Dispute Resolution & Refund Protocol ([DisputeModal.tsx](src/components/dashboard/DisputeModal.tsx)):**
+   * Allows micro-merchants to flag damaged or missing inventory, freezing escrow withdrawal and routing refunds back to merchant wallets.
+4. **Digital Delivery Receipt & Handoff Proof ([DeliveryReceiptModal.tsx](src/components/dashboard/DeliveryReceiptModal.tsx)):**
+   * Instant cryptographic receipt generator with print/export capabilities upon delivery verification.
 
 ---
 

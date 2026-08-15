@@ -94,7 +94,7 @@ export function DeliveryReceiptModal({
         <div className="p-6 pt-0 flex gap-3">
           <Button 
             onClick={handlePrintOrSave}
-            variant="outline" 
+            variant="secondary" 
             className="flex-1 flex items-center justify-center gap-2 text-xs py-2.5 rounded-xl border-slate-200"
           >
             <Download className="w-4 h-4" />

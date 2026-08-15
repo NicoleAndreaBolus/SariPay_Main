@@ -38,6 +38,7 @@ import {
   Handshake
 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { LiveActivityFeed } from '@/components/home/LiveActivityFeed';
 
 export default function Home() {
   const router = useRouter();
@@ -264,6 +265,11 @@ export default function Home() {
           </div>
 
         </div>
+      </section>
+      
+      {/* LIVE ON-CHAIN TRANSACTION FEED */}
+      <section className="w-full bg-white border-y border-[#E5E7EB] py-4">
+        <LiveActivityFeed />
       </section>
 
       {/* 2. TRUST METRICS SECTION */}

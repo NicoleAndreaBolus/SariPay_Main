@@ -29,63 +29,63 @@ export interface LiveTransaction {
 const INITIAL_TRANSACTIONS: LiveTransaction[] = [
   {
     id: 'ORD-8942',
-    merchant: "Aling Nena's Sari-Sari",
-    supplier: "Universal Robina Wholesale",
+    merchant: "Maria Santos (Aling Nena's Store)",
+    supplier: "Universal Robina Wholesale Hub",
     items: "5x Great Taste Coffee Boxes, 10x Piattos",
     amountPhp: 4850,
     amountXlm: "85.84",
     status: "Settled",
-    timestamp: "2 mins ago",
-    txHash: "7aa2dfdd8757f8f8167355641c39f9fa1d877bf4ef6c4ba8b88de2bbc40349d4",
-    settlementTime: "3.2s"
+    timestamp: "1 min ago",
+    txHash: "6a6a3af1b560dcb01001eb59aa6d58e04d5b100bbc0cbadc41b78d464e1dd6c2",
+    settlementTime: "2.8s"
   },
   {
     id: 'ORD-8941',
-    merchant: "Mang Tomas Store (Quezon City)",
+    merchant: "Elena Reyes (Mang Tomas Grocery QC)",
     supplier: "Monde Nissin Distribution",
     items: "12x Lucky Me Pancit Canton Bundles",
     amountPhp: 3200,
     amountXlm: "56.63",
     status: "Settled",
-    timestamp: "7 mins ago",
-    txHash: "a1c49b80327f311c81ef4554b7c8df4fef94c6328ff98017c6b54a378dfb9830",
-    settlementTime: "2.8s"
+    timestamp: "4 mins ago",
+    txHash: "22ec0dab1f74d2c61b19e4e65f43c17f497c83f647a022397fc389918d270a58",
+    settlementTime: "3.1s"
   },
   {
     id: 'ORD-8940',
-    merchant: "Nanay Belen Mini-Mart",
-    supplier: "San Miguel Beverage Hub",
+    merchant: "Ana Mendoza (Nanay Belen Mini-Mart)",
+    supplier: "San Miguel Beverage Depot",
     items: "8x Purefoods Corned Beef, 4x Magnolia Milk",
     amountPhp: 6750,
     amountXlm: "119.46",
     status: "In Escrow",
-    timestamp: "14 mins ago",
-    txHash: "882bf65d83bb3705ef29487c53b2f5bdf684a0d99ef87b0034a78cc3146b281f",
+    timestamp: "8 mins ago",
+    txHash: "ea77f760743eae6a4034e51c20b27a115559fa49274ec159a54bc890fc287839",
     settlementTime: "Lock Active"
   },
   {
     id: 'ORD-8939',
-    merchant: "Kanto Express Convenience",
+    merchant: "Grace Bautista (Kanto Express Store)",
     supplier: "Nestle Philippines B2B",
     items: "15x Bear Brand Milk Powder 300g",
     amountPhp: 5400,
     amountXlm: "95.57",
     status: "Settled",
-    timestamp: "28 mins ago",
-    txHash: "e6f4236ab318c6e267d354a88bc4878a25c15694bcf932158869c9b5a2e6f432",
+    timestamp: "15 mins ago",
+    txHash: "35033c38487d0adace36ebcecddfc424873212e6df6e128f27aa740f383cf308",
     settlementTime: "3.4s"
   },
   {
     id: 'ORD-8938',
-    merchant: "Ate Joy Variety Store",
-    supplier: "Century Pacific Food Depot",
+    merchant: "Liza Cruz (Ate Joy Variety Store)",
+    supplier: "Century Pacific Food Wholesale",
     items: "20x 555 Sardines, 10x Argentina Corned Beef",
     amountPhp: 3950,
     amountXlm: "69.91",
     status: "Settled",
-    timestamp: "41 mins ago",
-    txHash: "f1a8c3e41295b9d784a03c215e98bb4f912c478a5563910c2e74bf1092a3487c",
-    settlementTime: "3.1s"
+    timestamp: "24 mins ago",
+    txHash: "4a4e1e0c99670c5a8066cab3ac4b9be166a1e63eedd446cd5a63b5c30d610dca",
+    settlementTime: "2.9s"
   }
 ];
 

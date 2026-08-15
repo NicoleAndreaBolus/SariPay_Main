@@ -481,6 +481,7 @@ export function useSariPayContract() {
 
   return {
     orders,
+    saveOrders,
     initOrder,
     fundOrder,
     dispatchOrder,

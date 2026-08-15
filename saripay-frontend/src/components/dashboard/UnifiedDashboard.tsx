@@ -50,13 +50,19 @@ import {
   Database,
   ShieldAlert,
   ClipboardCheck,
-  CheckCircle
+  CheckCircle,
+  ShoppingBag,
+  Receipt,
+  AlertTriangle
 } from 'lucide-react';
 import { LogoLockup, LogoIcon } from '@/components/common/Logo';
 import { CurrencyConverter } from '@/components/dashboard/CurrencyConverter';
 import { DeliveryReceiptModal } from '@/components/dashboard/DeliveryReceiptModal';
 import { DisputeModal } from '@/components/dashboard/DisputeModal';
 import { QRScannerModal } from '@/components/dashboard/QRScannerModal';
+import RestockCatalogModal from '@/components/dashboard/RestockCatalogModal';
+import TopUpModal from '@/components/dashboard/TopUpModal';
+import SariScoreWidget from '@/components/dashboard/SariScoreWidget';
 
 interface AppNotification {
   id: string;
@@ -93,8 +99,8 @@ export default function UnifiedDashboard() {
 
   // Custom hooks
   const wallet = useStellarWallet();
-  const { walletAddress, walletBalance, authType, disconnect, refreshBalance } = wallet;
-  const { orders, fundOrder, initOrder, dispatchOrder, confirmDelivery, getOrder, syncOrders, resetMockData } = useSariPayContract();
+  const { walletAddress, walletBalance, authType, disconnect, refreshBalance, updateBalance } = wallet;
+  const { orders, saveOrders, fundOrder, initOrder, dispatchOrder, confirmDelivery, getOrder, syncOrders, resetMockData } = useSariPayContract();
 
   // Import Order State
   const [importOrderId, setImportOrderId] = useState('');
@@ -201,7 +207,46 @@ export default function UnifiedDashboard() {
   const [isSubmittingInvoice, setIsSubmittingInvoice] = useState(false);
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
-  const [lastSettledTxHash, setLastSettledTxHash] = useState<string>('7aa2dfdd8757f8f8167355641c39f9fa1d877bf4ef6c4ba8b88de2bbc40349d4');
+  const [isRestockModalOpen, setIsRestockModalOpen] = useState(false);
+  const [isTopUpModalOpen, setIsTopUpModalOpen] = useState(false);
+  const [lastSettledTxHash, setLastSettledTxHash] = useState<string>('6a6a3af1b560dcb01001eb59aa6d58e04d5b100bbc0cbadc41b78d464e1dd6c2');
+
+  const handlePlaceRestockOrder = (orderData: {
+    supplier: string;
+    details: string;
+    amountXlm: string;
+    amountPhp: number;
+  }) => {
+    const newId = String(Math.floor(10000 + Math.random() * 90000));
+    const newOrder: Order = {
+      id: newId,
+      supplier: orderData.supplier,
+      amount: orderData.amountXlm,
+      status: 'Funded',
+      date: new Date().toISOString().split('T')[0],
+      details: orderData.details,
+      merchantAddress: activeWorkspace?.walletAddress || 'GBSARIMERCHANT123XYZ',
+      merchantName: activeWorkspace?.name || "My Sari-Sari Store"
+    };
+
+    saveOrders([newOrder, ...orders]);
+    addNotification("Restock Escrow Created", `Order #${newId} for ${orderData.details} locked in smart escrow!`, "success");
+  };
+
+  const handleTopUpSuccess = (amountXlm: number, amountPhp: number) => {
+    const current = parseFloat(walletBalance || '0');
+    const newBal = (current + amountXlm).toFixed(2);
+    if (updateBalance) updateBalance(newBal);
+    addNotification("Deposit Successful", `Credited ₱${amountPhp.toLocaleString()} (${amountXlm} XLM) to your merchant wallet.`, "success");
+  };
+
+  const handleDrawAdvance = (amountPhp: number) => {
+    const advanceXlm = (amountPhp / xlmPrice).toFixed(2);
+    const current = parseFloat(walletBalance || '0');
+    const newBal = (current + parseFloat(advanceXlm)).toFixed(2);
+    if (updateBalance) updateBalance(newBal);
+    addNotification("Restock Advance Approved", `₱${amountPhp.toLocaleString()} (${advanceXlm} XLM) zero-interest working capital credited!`, "success");
+  };
 
   const [alertConfig, setAlertConfig] = useState<{
     isOpen: boolean;
@@ -1267,6 +1312,13 @@ export default function UnifiedDashboard() {
                   </div>
                 </div>
 
+                {/* SariScore Credit & Working Capital Widget */}
+                <SariScoreWidget
+                  completedDeliveriesCount={merchantStats.completedDeliveries}
+                  onOpenTopUp={() => setIsTopUpModalOpen(true)}
+                  onDrawAdvance={handleDrawAdvance}
+                />
+
                 {/* Metrics cards grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col justify-between h-[120px] relative overflow-hidden group">
@@ -1313,22 +1365,33 @@ export default function UnifiedDashboard() {
                   {/* Active Purchase Queue (Left Column) */}
                   <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-sm flex flex-col gap-6 w-full">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div className="flex items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="text-base font-bold text-[#111827]">Active Purchase Queue</h3>
+                        
+                        {/* 1-Click Restock Order Button */}
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => setIsRestockModalOpen(true)}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold py-1.5 px-3 rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5" /> + New Restock Order
+                        </Button>
+
                         <form onSubmit={handleImportOrder} className="flex items-center gap-2">
                           <input
                             type="text"
                             value={importOrderId}
                             onChange={(e) => setImportOrderId(e.target.value)}
                             placeholder="Import Order ID..."
-                            className="px-3 py-1.5 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:border-emerald-500 font-mono w-32"
+                            className="px-3 py-1.5 text-xs border border-[#E5E7EB] rounded-xl focus:outline-none focus:border-emerald-500 font-mono w-28"
                           />
                           <button
                             type="submit"
                             disabled={isImporting}
-                            className="px-3 py-1.5 text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
+                            className="px-2.5 py-1.5 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl active:scale-95 transition-all duration-200 cursor-pointer disabled:opacity-50"
                           >
-                            {isImporting ? 'Importing...' : 'Import'}
+                            {isImporting ? '...' : 'Import'}
                           </button>
                         </form>
                       </div>
@@ -1373,36 +1436,65 @@ export default function UnifiedDashboard() {
                                 <td className="py-4 font-bold text-[#111827]">{order.amount} XLM</td>
                                 <td className="py-4">{getStatusBadge(order.status)}</td>
                                 <td className="py-4 text-right">
-                                  {order.status === 'Initialized' ? (
-                                    <Button
-                                      variant="primary"
-                                      size="sm"
-                                      onClick={() => handleLockEscrow(order.id, order.amount)}
-                                      isLoading={fundingId === order.id}
-                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
-                                          ? 'bg-[#059669] hover:bg-[#10B981] text-white'
-                                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                        }`}
-                                    >
-                                      Fund Escrow
-                                    </Button>
-                                  ) : (order.status === 'Funded' || order.status === 'In Transit') ? (
-                                    <Button
-                                      variant="primary"
-                                      size="sm"
-                                      onClick={() => openScanner(order)}
-                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className={`text-[11px] font-semibold py-1.5 px-3 rounded-lg cursor-pointer animate-pulse ${activeWorkspace.verificationStatus === 'Verified'
-                                          ? 'bg-[#059669] hover:bg-[#10B981] text-white'
-                                          : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
-                                        }`}
-                                    >
-                                      Scan Delivery QR
-                                    </Button>
-                                  ) : (
-                                    <span className="text-[10px] text-[#059669] font-bold">✓ Settled</span>
-                                  )}
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    {order.status === 'Initialized' && (
+                                      <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => handleLockEscrow(order.id, order.amount)}
+                                        isLoading={fundingId === order.id}
+                                        disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                        className={`text-[11px] font-semibold py-1 px-3 rounded-lg cursor-pointer ${activeWorkspace.verificationStatus === 'Verified'
+                                            ? 'bg-[#059669] hover:bg-[#10B981] text-white'
+                                            : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                                          }`}
+                                      >
+                                        Fund Escrow
+                                      </Button>
+                                    )}
+
+                                    {(order.status === 'Funded' || order.status === 'In Transit') && (
+                                      <>
+                                        <Button
+                                          variant="primary"
+                                          size="sm"
+                                          onClick={() => openScanner(order)}
+                                          disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                          className={`text-[11px] font-bold py-1 px-2.5 rounded-lg cursor-pointer flex items-center gap-1 ${activeWorkspace.verificationStatus === 'Verified'
+                                              ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
+                                              : 'bg-stone-100 text-stone-400 border border-stone-200 cursor-not-allowed'
+                                            }`}
+                                        >
+                                          <QrCode className="w-3.5 h-3.5" /> Scan Driver QR
+                                        </Button>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setSelectedOrder(order);
+                                            setIsDisputeModalOpen(true);
+                                          }}
+                                          className="text-[11px] font-bold py-1 px-2.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                                        >
+                                          <AlertTriangle className="w-3 h-3" /> Dispute
+                                        </button>
+                                      </>
+                                    )}
+
+                                    {order.status === 'Delivered' && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedOrder(order);
+                                          setLastSettledTxHash(order.id === '8942' ? '6a6a3af1b560dcb01001eb59aa6d58e04d5b100bbc0cbadc41b78d464e1dd6c2' : '22ec0dab1f74d2c61b19e4e65f43c17f497c83f647a022397fc389918d270a58');
+                                          setIsReceiptModalOpen(true);
+                                        }}
+                                        className="text-[11px] font-bold py-1 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                                      >
+                                        <Receipt className="w-3 h-3 text-emerald-600" /> Receipt ↗
+                                      </button>
+                                    )}
+                                  </div>
                                 </td>
                               </tr>
                             ))}
@@ -1421,10 +1513,10 @@ export default function UnifiedDashboard() {
                                 <p className="font-bold text-[#111827] text-xs">{order.supplier}</p>
                                 <p className="text-[10px] text-[#6B7280] mt-0.5 leading-relaxed">{order.details}</p>
                               </div>
-                              <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1">
+                              <div className="flex justify-between items-center border-t border-[#E5E7EB] pt-3 mt-1 flex-wrap gap-2">
                                 <span className="font-bold text-[#111827] text-xs">{order.amount} XLM</span>
-                                <div>
-                                  {order.status === 'Initialized' ? (
+                                <div className="flex items-center gap-1.5">
+                                  {order.status === 'Initialized' && (
                                     <Button
                                       variant="primary"
                                       size="sm"
@@ -1435,18 +1527,44 @@ export default function UnifiedDashboard() {
                                     >
                                       Fund Escrow
                                     </Button>
-                                  ) : (order.status === 'Funded' || order.status === 'In Transit') ? (
-                                    <Button
-                                      variant="primary"
-                                      size="sm"
-                                      onClick={() => openScanner(order)}
-                                      disabled={activeWorkspace.verificationStatus !== 'Verified'}
-                                      className="bg-[#059669] text-white text-[11px] font-semibold"
+                                  )}
+
+                                  {(order.status === 'Funded' || order.status === 'In Transit') && (
+                                    <>
+                                      <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => openScanner(order)}
+                                        disabled={activeWorkspace.verificationStatus !== 'Verified'}
+                                        className="bg-emerald-600 text-white text-[11px] font-bold py-1 px-2 rounded-lg"
+                                      >
+                                        <QrCode className="w-3 h-3 mr-1" /> Scan
+                                      </Button>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedOrder(order);
+                                          setIsDisputeModalOpen(true);
+                                        }}
+                                        className="text-[11px] font-bold py-1 px-2 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg"
+                                      >
+                                        Dispute
+                                      </button>
+                                    </>
+                                  )}
+
+                                  {order.status === 'Delivered' && (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setSelectedOrder(order);
+                                        setLastSettledTxHash('6a6a3af1b560dcb01001eb59aa6d58e04d5b100bbc0cbadc41b78d464e1dd6c2');
+                                        setIsReceiptModalOpen(true);
+                                      }}
+                                      className="text-[11px] font-bold py-1 px-2.5 bg-slate-100 text-slate-800 border border-slate-200 rounded-lg flex items-center gap-1"
                                     >
-                                      Scan Delivery QR
-                                    </Button>
-                                  ) : (
-                                    <span className="text-[10px] text-[#059669] font-bold">✓ Settled</span>
+                                      <Receipt className="w-3 h-3 text-emerald-600" /> Receipt
+                                    </button>
                                   )}
                                 </div>
                               </div>
@@ -3963,7 +4081,7 @@ export default function UnifiedDashboard() {
           isOpen={isReceiptModalOpen}
           onClose={() => setIsReceiptModalOpen(false)}
           orderId={selectedOrder.id}
-          merchantName={selectedOrder.merchantName || 'Nicole Corner Store'}
+          merchantName={selectedOrder.merchantName || activeWorkspace?.name || 'My Sari-Sari Store'}
           supplierName={selectedOrder.supplier || 'Santos FMCG Wholesale'}
           amountXlm={selectedOrder.amount}
           amountPhp={(parseFloat(selectedOrder.amount) * 56.5).toFixed(2)}
@@ -3978,7 +4096,7 @@ export default function UnifiedDashboard() {
           isOpen={isDisputeModalOpen}
           onClose={() => setIsDisputeModalOpen(false)}
           orderId={selectedOrder.id}
-          merchantName={selectedOrder.merchantName || 'Nicole Corner Store'}
+          merchantName={selectedOrder.merchantName || activeWorkspace?.name || 'My Sari-Sari Store'}
           supplierName={selectedOrder.supplier || 'Santos FMCG Wholesale'}
           amountXlm={selectedOrder.amount}
           amountPhp={(parseFloat(selectedOrder.amount) * 56.5).toFixed(2)}
@@ -3987,6 +4105,22 @@ export default function UnifiedDashboard() {
           }}
         />
       )}
+
+      {/* 1-CLICK WHOLESALE RESTOCK CATALOG MODAL */}
+      <RestockCatalogModal
+        isOpen={isRestockModalOpen}
+        onClose={() => setIsRestockModalOpen(false)}
+        onPlaceOrder={handlePlaceRestockOrder}
+        merchantName={activeWorkspace?.name || "My Sari-Sari Store"}
+      />
+
+      {/* FIAT PHP (GCASH / MAYA) TOP-UP MODAL */}
+      <TopUpModal
+        isOpen={isTopUpModalOpen}
+        onClose={() => setIsTopUpModalOpen(false)}
+        onSuccess={handleTopUpSuccess}
+        currentBalanceXlm={walletBalance || '0.00'}
+      />
 
     </>
   );

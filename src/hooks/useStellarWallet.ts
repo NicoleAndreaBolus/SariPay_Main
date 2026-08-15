@@ -159,11 +159,17 @@ export function useStellarWallet() {
     });
   }, []);
 
+  const updateBalance = useCallback((newBalance: string) => {
+    localStorage.setItem('saripay_wallet_balance', newBalance);
+    setState(prev => ({ ...prev, walletBalance: newBalance }));
+  }, []);
+
   return {
     ...state,
     linkFreighter,
     setupPasskey,
     disconnect,
+    updateBalance,
     refreshBalance: async () => {
       if (state.walletAddress) {
         if (state.authType === 'freighter') {

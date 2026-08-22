@@ -1,4 +1,4 @@
-﻿# SariPay B2B
+# SariPay B2B
 
 > Stellar-powered supply chain micro-escrow smart payment dApp for neighborhood merchants and wholesale FMCG distributors in Southeast Asia.
 
@@ -84,6 +84,7 @@
   * **Inter-Contract Communication**: Uses Soroban SAC Token Client (`token::Client`) to execute locked escrow transfers and payout releases in a single atomic transaction.
   * **Event Streaming & Real-Time Updates**: Home page [`LiveActivityFeed.tsx`](src/components/home/LiveActivityFeed.tsx) and live balance polling from Stellar Horizon RPC.
 * **Camera-Based Hardware Integration**: Real-time mobile video feed scanner ([`QRScannerModal.tsx`](src/components/dashboard/QRScannerModal.tsx)) for instant physical-to-digital retail proof-of-delivery.
+* **Automated CI/CD Pipeline**: Configured GitHub Actions workflow ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) running automated contract validation, Next.js build typechecking, and production deployment checks on every push to `master` and `main`.
 * **Mobile-First Responsive Layout**: Built with fluid Tailwind grids, touch-friendly UI components, and mobile drawer navigation.
 * **Interactive Walkthrough Script**: Documented in [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) and [`TWITTER_LAUNCH.md`](TWITTER_LAUNCH.md).
 

@@ -48,11 +48,12 @@ export function Navbar() {
   };
 
   const navLinks = [
-    { label: 'Features', href: '#features' },
-    { label: 'How It Works', href: '#how-it-works' },
-    { label: 'Solutions', href: '#solutions' },
-    { label: 'Security', href: '#security' },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'Smart Inventory', href: '/inventory' },
+    { label: 'SariCredit™', href: '/credit' },
+    { label: 'Invoicing', href: '/invoice' },
+    { label: 'Merchant Dashboard', href: '/dashboard/customer' },
+    { label: 'Distributor Hub', href: '/dashboard/supplier' },
+    { label: 'Admin Portal', href: '/admin' },
   ];
 
   return (

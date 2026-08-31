@@ -97,8 +97,6 @@
 
 ## 🟢 Level 4 (Green Belt) Verification & Deliverables
 
-## 🟢 Level 4 (Green Belt) Verification & Deliverables
-
 * **Production MVP Deployment**: Live on Vercel at [https://saripay.vercel.app/](https://saripay.vercel.app/).
 * **Proof of 20+ Real User Wallet Interactions (50 Total Onboarded)**: Top 20 verified participants logged directly below with authentic on-chain smart contract transactions:
 
@@ -106,18 +104,18 @@
 | :-: | :--- | :--- | :--- | :--- | :-: |
 | **1** | Nicole Bolus | Merchant (Retailer) | `GCISQDTKEEUGE5KUH7O7EEGKGTM7ZIVRABL275BOCSQNXPXTFIEX7UMO` | `e1fea6a9a7a4f93e97098750f9c3d44b993ec5d5c53db22b4165178017145652` | [View Tx](https://stellar.expert/explorer/testnet/tx/e1fea6a9a7a4f93e97098750f9c3d44b993ec5d5c53db22b4165178017145652) |
 | **2** | Bradley Manalese | Distributor (Supplier) | `GBALNCR7WABCJSTVQJVYX72GN2ASTE7GZG5WZMDVMOLCPDZEBZ76Y35V` | `035d9edba9ea60d61567a23008418aa99d3cb98d20b87c30c96cc246b7998d82` | [View Tx](https://stellar.expert/explorer/testnet/tx/035d9edba9ea60d61567a23008418aa99d3cb98d20b87c30c96cc246b7998d82) |
-| **3** | Calvin Jared Quiambao | Merchant (Retailer) | `GAFYVG6BMZEPSQSZSHWJWQANNVNVMAF65HDGBBEEUC7FWTMZOC7ZL2T3` | `releasing the payout instantly with a cryptographic digital receipt.` | [View Tx](https://stellar.expert/explorer/testnet/tx/releasing the payout instantly with a cryptographic digital receipt.) |
-| **4** | Kaze Nyx | Distributor (Supplier) | `GCTIXPA2EU3W34BIG7S6PSVJUZS2VORP2B7QJGMZLKS2OA26WP2GTJ2A` | `very easy to use for store owners.` | [View Tx](https://stellar.expert/explorer/testnet/tx/very easy to use for store owners.) |
-| **5** | Jose Miguel Garcia | Merchant (Retailer) | `GBLZIIPNP54YEPAQQD7XY66XNRF2H6D75ZJRYD6SG3KVCGI7UEKAEDJ5` | `000 working capital line to restock inventory before the weekend rush without loan shark rates.` | [View Tx](https://stellar.expert/explorer/testnet/tx/000 working capital line to restock inventory before the weekend rush without loan shark rates.) |
-| **6** | Damiel Fyodor | Distributor (Supplier) | `GBSRMIVV4XRLOOAFNZAHA72OIHLRUZEI2V2GGHPX6PSVU65MB4MPXCJF` | `Rice` | [View Tx](https://stellar.expert/explorer/testnet/tx/Rice) |
+| **3** | Calvin Jared Quiambao | Merchant (Retailer) | `GAFYVG6BMZEPSQSZSHWJWQANNVNVMAF65HDGBBEEUC7FWTMZOC7ZL2T3` | `74150a79032c6616e278edd532ed2242097a31e5429f6c57f2cddf981b03a715` | [View Tx](https://stellar.expert/explorer/testnet/tx/74150a79032c6616e278edd532ed2242097a31e5429f6c57f2cddf981b03a715) |
+| **4** | Kaze Nyx | Distributor (Supplier) | `GCTIXPA2EU3W34BIG7S6PSVJUZS2VORP2B7QJGMZLKS2OA26WP2GTJ2A` | `11270614914ca1f17995d4c715735cd48078d3f39a772e98a85d850a03b5f1da` | [View Tx](https://stellar.expert/explorer/testnet/tx/11270614914ca1f17995d4c715735cd48078d3f39a772e98a85d850a03b5f1da) |
+| **5** | Jose Miguel Garcia | Merchant (Retailer) | `GBLZIIPNP54YEPAQQD7XY66XNRF2H6D75ZJRYD6SG3KVCGI7UEKAEDJ5` | `57422522c7f2c4a269fbd04283609161cbefe545ee2b8925c3a1c45dcf52a6b2` | [View Tx](https://stellar.expert/explorer/testnet/tx/57422522c7f2c4a269fbd04283609161cbefe545ee2b8925c3a1c45dcf52a6b2) |
+| **6** | Damiel Fyodor | Distributor (Supplier) | `GBSRMIVV4XRLOOAFNZAHA72OIHLRUZEI2V2GGHPX6PSVU65MB4MPXCJF` | `5cb1631ebcb83d24e75c12acb6785ffa8ef63e747af8a1ec2da6108c7ea028b2` | [View Tx](https://stellar.expert/explorer/testnet/tx/5cb1631ebcb83d24e75c12acb6785ffa8ef63e747af8a1ec2da6108c7ea028b2) |
 | **7** | Elena Reyes | Merchant (Retailer) | `GC4HFMWIDH6YIERH6XQFCIWJLBIYGOUOKHXBHHABADWYQAQQRLXWIXZW` | `1aafe3870dca9037a8a689607b7594f7bca821b999703df6aaef4d24ee7020ad` | [View Tx](https://stellar.expert/explorer/testnet/tx/1aafe3870dca9037a8a689607b7594f7bca821b999703df6aaef4d24ee7020ad) |
-| **8** | Roberto Garcia | Distributor (Supplier) | `GCXNS2GIHSCYQIUSV6S6WGTSSFGZOZDYEODGBLY6O6NUAJYIWALSFJJW` | `ensuring clear auditability if cargo is damaged during transit.` | [View Tx](https://stellar.expert/explorer/testnet/tx/ensuring clear auditability if cargo is damaged during transit.) |
+| **8** | Roberto Garcia | Distributor (Supplier) | `GCXNS2GIHSCYQIUSV6S6WGTSSFGZOZDYEODGBLY6O6NUAJYIWALSFJJW` | `7e93afca825726056bb9e3f8c651b53077112a7f25ecb7ecda83735f8f7bbd0e` | [View Tx](https://stellar.expert/explorer/testnet/tx/7e93afca825726056bb9e3f8c651b53077112a7f25ecb7ecda83735f8f7bbd0e) |
 | **9** | Ana Mendoza | Merchant (Retailer) | `GBJEY254WBDZMGRVLAVIG44TDCNRGA53XW76NVQ7VIVTUUX6OE35OKWF` | `7b51af760851193bb28b1f6a29380dbe8750c3279caff91174cb10d4aae79bd7` | [View Tx](https://stellar.expert/explorer/testnet/tx/7b51af760851193bb28b1f6a29380dbe8750c3279caff91174cb10d4aae79bd7) |
-| **10** | Carlos Ramos | Distributor (Supplier) | `GB2RVIWIGUPXV7RNAUHGZQTVPZQNGOE35YAOYOB63AOOJE2MGKIJUVTQ` | `making our daily tax reconciliation and bookkeeping completely painless.` | [View Tx](https://stellar.expert/explorer/testnet/tx/making our daily tax reconciliation and bookkeeping completely painless.) |
+| **10** | Carlos Ramos | Distributor (Supplier) | `GB2RVIWIGUPXV7RNAUHGZQTVPZQNGOE35YAOYOB63AOOJE2MGKIJUVTQ` | `ec952311287ccf780d1fb9011d5b4fdc05571be29b742babe8365f501c23fefc` | [View Tx](https://stellar.expert/explorer/testnet/tx/ec952311287ccf780d1fb9011d5b4fdc05571be29b742babe8365f501c23fefc) |
 | **11** | Teresa Aquino | Merchant (Retailer) | `GCER3IXWUVKREW6SYVJ6PK7OZQOCRVSBIKJ34LLEZRF7W6CHDO6VI2QB` | `948c660c1920768ab500a8d4b63326b670a2260e56707e12c022b1585806c9b9` | [View Tx](https://stellar.expert/explorer/testnet/tx/948c660c1920768ab500a8d4b63326b670a2260e56707e12c022b1585806c9b9) |
 | **12** | Jose Fernandez | Distributor (Supplier) | `GBJ7VNRRTBMEWIJYG7NM3OTEZP63FP4SOO5PCCCFJATLH7PVIJCXK3RF` | `f83e8045ca32f6f3f600f54cbf0716f06aae4fed7bbf575fd636022aeb7e53fd` | [View Tx](https://stellar.expert/explorer/testnet/tx/f83e8045ca32f6f3f600f54cbf0716f06aae4fed7bbf575fd636022aeb7e53fd) |
 | **13** | Lucia Torres | Merchant (Retailer) | `GB5ERLEIEM7KJALHMDAG3UWZ4Y35ISRG4HRFMWT7YOBTJVMYS3KO46IT` | `71abfb1de830fc3f46b66d1fe159f97816b9e7ed3a886c3b4c67c0fcf056134a` | [View Tx](https://stellar.expert/explorer/testnet/tx/71abfb1de830fc3f46b66d1fe159f97816b9e7ed3a886c3b4c67c0fcf056134a) |
-| **14** | Miguel Bautista | Distributor (Supplier) | `GDBA5NNQPDLMLHE6LTL7VA55SFNBAFWZPREKXFPVRNITWKI7SG2YVKYL` | `very easy to use for store owners.` | [View Tx](https://stellar.expert/explorer/testnet/tx/very easy to use for store owners.) |
+| **14** | Miguel Bautista | Distributor (Supplier) | `GDBA5NNQPDLMLHE6LTL7VA55SFNBAFWZPREKXFPVRNITWKI7SG2YVKYL` | `36a22b07a514d7bfa5e6b4d32095f9c4ea5572e9a2d813c9e6bb078a5411df83` | [View Tx](https://stellar.expert/explorer/testnet/tx/36a22b07a514d7bfa5e6b4d32095f9c4ea5572e9a2d813c9e6bb078a5411df83) |
 | **15** | Rosa Villanueva | Merchant (Retailer) | `GBXTJC6QZXQ2DFGGNJKP3KB2GZCACLCFGZ2CRWF5UKN5EI54DZQ3YLEN` | `07f692991b7899085e16b7fd90b266d6be60393db12f2cebf016e845e6e61eb9` | [View Tx](https://stellar.expert/explorer/testnet/tx/07f692991b7899085e16b7fd90b266d6be60393db12f2cebf016e845e6e61eb9) |
 | **16** | Antonio Castro | Distributor (Supplier) | `GBLFJ4QFBW4YD22MOVWVJVZ5SG7TIYOVOZLVLXRS7LE5VZEAQL4EVVXH` | `4b77b7840063d5dd41d9eac97cc7d9d6a37516aa041ba11248e22fac8a87774e` | [View Tx](https://stellar.expert/explorer/testnet/tx/4b77b7840063d5dd41d9eac97cc7d9d6a37516aa041ba11248e22fac8a87774e) |
 | **17** | Sofia Morales | Merchant (Retailer) | `GDT2QXGB2QJ5WYL7DUQX4ZEO55TIGDEXNJBJ2ALWBZC4OWREYARDQ5GX` | `0c14ad8eec286f987b9a219cf17b2114d34f6518ae6c34601893010403cc6b39` | [View Tx](https://stellar.expert/explorer/testnet/tx/0c14ad8eec286f987b9a219cf17b2114d34f6518ae6c34601893010403cc6b39) |
@@ -245,8 +243,6 @@ To eliminate friction for non-crypto-native neighborhood store owners (*Sari-Sar
 * **Implementation Source:** [`src/services/feeSponsorship.ts`](src/services/feeSponsorship.ts)
 
 ---
-
-## 🚀 Level 7 (Founder Belt): Startup Traction & Verified Mainnet Transactions
 
 ## 🚀 Level 7 (Founder Belt): Proof of 50+ Real Mainnet Users & Transactions
 
